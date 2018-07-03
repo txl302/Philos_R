@@ -14,15 +14,25 @@ def listen_robot():
 
 
 def listen_function():
+
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	s.bind(('127.0.0.1',8014))
 
 	data, addr = s.recvfrom(1024)
-	print 'Received from %s:%s.' %addr
-	print 'function %s online' %data
 
-	table_function.append(data)
+	if data == 'connect':
+		print 'Received from %s:%s.' %addr
+		print 'function %s online' %data
 
+		s.sendto('Hello, %s!' % data, addr)
+
+
+
+		table_function.append(data)
+
+	if data == 'disconnect':
+		print 'Function %s disconnect from the server' %data
+		print 'Function %s '
 
 def robot_thread():
 

@@ -17,6 +17,8 @@ def disconnect():
 
 	data = 'disconnect'
 
+	s.sendto(data, ('127.0.0.1', 8014))
+
 	s.close()
 
 def command():
