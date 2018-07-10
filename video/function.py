@@ -51,36 +51,18 @@ class webCamConnect:
 						cv2.destroyAllWindows() 
 						print("abandon connection") 
 						break 
-	def getData(self, interval): 
-		showThread=threading.Thread(target=self._processImage); 
-		showThread.start(); 
-		if interval != 0:
-			saveThread=threading.Thread(target=self._savePicToLocal,args = (interval, )); 
-			saveThread.setDaemon(1); 
-			saveThread.start(); 
+
+
 	def setWindowName(self, name): 
 		self.name = name; 
 	def setRemoteAddress(remoteAddress): 
 		self.remoteAddress = remoteAddress; 
-	def _savePicToLocal(self, interval): 
-		while(1): 
-			try: 
-				self.mutex.acquire(); 
-				path=os.getcwd() + "\\" + "savePic"; 
-				if not os.path.exists(path): 
-					os.mkdir(path); 
-					cv2.imwrite(path + "\\" + time.strftime("%Y%m%d-%H%M%S", time.localtime(time.time())) + ".jpg",self.image) 
-			except: 
-				pass; 
-			finally: 
-				self.mutex.release(); 
-				time.sleep(interval); 
+
 
 def main(): 
 	print("create connection") 
 	cam = webCamConnect(); 
-
 	cam.connect(); 
-	cam.getData(cam.interval); 
+	cam._processImage();
 if __name__ == "__main__": 
 	main();
