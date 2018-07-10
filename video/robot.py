@@ -38,7 +38,7 @@ class webCamera:
 			return
 		camera = cv2.VideoCapture(0) 
 		encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),self.img_quality] 
-		f = open("video_info.txt", 'a+') 
+
 		while(1): 
 			time.sleep(0.13) 
 			(grabbed, self.img) = camera.read() 
@@ -49,15 +49,14 @@ class webCamera:
 			try: 
 				client.send(struct.pack("lhh",len(self.imgdata), self.resolution[0],self.resolution[1])+self.imgdata);
 			except: 
-				f = open("video_info.txt", 'a+') 
+
 				camera.release() 
 				f.close() 
 				return; 
 	def run(self): 
-		while(1): 
-			client,addr = self.socket.accept(); 
-			clientThread = threading.Thread(target = self._processConnection, args = (client, addr, ));
-			clientThread.start();
+		client,addr = self.socket.accept(); 
+		self._processConnection(client, addr);
+
 
 def main(): 
 		cam = webCamera(); 
