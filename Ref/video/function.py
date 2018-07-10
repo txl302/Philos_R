@@ -9,7 +9,7 @@ import cv2
 import re 
 
 class webCamConnect: 
-	def __init__(self, resolution = [640,480], remoteAddress = ("192.168.1.183", 7999), windowName = "video"): 
+	def __init__(self, resolution = [640,480], remoteAddress = ("192.168.1.183", 7999), windowName = "Taoge Niubi"): 
 		self.remoteAddress = remoteAddress; 
 		self.resolution = resolution; 
 		self.name = windowName; 

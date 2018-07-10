@@ -40,7 +40,7 @@ class webCamera:
 		encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),self.img_quality] 
 
 		while(1): 
-			time.sleep(0.13) 
+
 			(grabbed, self.img) = camera.read() 
 			self.img = cv2.resize(self.img,self.resolution) 
 			result, imgencode = cv2.imencode('.jpg',self.img,encode_param) 
@@ -48,10 +48,12 @@ class webCamera:
 			self.imgdata = img_code.tostring() 
 			try: 
 				client.send(struct.pack("lhh",len(self.imgdata), self.resolution[0],self.resolution[1])+self.imgdata);
-			except: 
+			except:
 
-				camera.release() 
-				f.close() 
+				pass
+
+				#camera.release() 
+
 				return; 
 	def run(self): 
 		client,addr = self.socket.accept(); 
