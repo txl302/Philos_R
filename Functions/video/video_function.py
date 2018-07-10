@@ -45,12 +45,13 @@ class webCamConnect:
 						gray = cv2.cvtColor(self.image,cv2.COLOR_BGR2GRAY)
 
 						faces = face_cascade.detectMultiScale(gray, scaleFactor = 1.15, minNeighbors = 5, minSize = (5,5), flags = cv2.cv.CV_HAAR_SCALE_IMAGE)
-
-						for(x,y,w,h) in faces:
+						
+    					for (x,y,w,h) in faces:
     						#cv2.rectangle(image,(x,y),(x+w,y+w),(0,255,0),2)
     						cv2.circle(self.image,((x+x+w)/2,(y+y+h)/2),w/2,(0,255,0),2)
 
 						cv2.imshow(self.name,self.image) 
+
 				except: 
 					print("receive failed") 
 					pass; 
