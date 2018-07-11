@@ -6,29 +6,44 @@ table_function = []
 
 def listen_robot():
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	s.bind(('127.0.0.1', 8013))
-
-	data, addr = s.recvfrom(1024)
-	print 'Received from %s:%s.' %addr
-	print 'Robot %s online' %data
-
-
-def listen_function():
-
-	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	s.bind(('127.0.0.1',8014))
+	s.bind(('', 8013))
 
 	data, addr = s.recvfrom(1024)
 
 	if data == 'connect':
+
 		print 'Received from %s:%s.' %addr
-		print 'function %s online' %data
 
-		s.sendto('Hello, %s!' % data, addr)
+		s.sendto('comfirmed', addr)
+
+		f_name = s.recv(1024)
+
+		print 'Robot %s online' %f_name
+
+		table_function.append((f_name, addr))
 
 
 
-		table_function.append(data)
+def listen_function():
+
+	global table_function
+
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.bind(('',8014))
+
+	data, addr = s.recvfrom(1024)
+
+	if data == 'connect':
+
+		print 'Received from %s:%s.' %addr
+
+		s.sendto('comfirmed', addr)
+
+		f_name = s.recv(1024)
+
+		print 'Function %s online' %f_name
+
+		table_function.append((f_name, addr))
 
 	if data == 'disconnect':
 		print 'Function %s disconnect from the server' %data

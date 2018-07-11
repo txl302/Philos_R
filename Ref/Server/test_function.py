@@ -7,9 +7,12 @@ def connect():
 	
 	global s
 
-	data = 'test function'
+	data = 'connect'
 	 
 	s.sendto(data, ('127.0.0.1', 8014))
+
+	if s.recv(1024) == 'comfirmed':
+		s.sendto('test', ('127.0.0.1', 8014))
 
 def disconnect():
 

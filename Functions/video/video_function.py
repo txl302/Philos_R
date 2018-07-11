@@ -1,5 +1,6 @@
 import socket; 
 import threading; 
+
 import struct; 
 import os; 
 import time; 
@@ -8,9 +9,13 @@ import numpy
 import cv2
 import re 
 
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+addr = ''
+
 class webCamConnect: 
-	def __init__(self, resolution = [640,480], remoteAddress = ("192.168.1.183", 7999), windowName = "Taoge Niubi"): 
-		self.remoteAddress = remoteAddress; 
+	def __init__(self, resolution = [640,480], windowName = "Taoge Niubi"): 
+
 		self.resolution = resolution; 
 		self.name = windowName; 
 		self.mutex = threading.Lock(); 
@@ -71,10 +76,95 @@ class webCamConnect:
 		self.remoteAddress = remoteAddress; 
 
 
-def main(): 
+def func(addr): 
 	print("create connection") 
 	cam = webCamConnect(); 
+	cam.setRemoteAddress(addr)
 	cam.connect(); 
 	cam._processImage();
-if __name__ == "__main__": 
-	main();
+
+
+
+def connect():
+	
+	global s
+
+	data = 'connect' 
+	s.sendto(data, ('192.168.1.42', 8014))
+	if s.recv(1024) == 'comfirmed':
+		s.sendto('test', ('192.168.1.42', 8014))
+
+def disconnect():
+
+	global s
+
+	data = 'disconnect'
+	s.sendto(data, ('192.168.1.42', 8014))
+	s.close()
+
+def command():
+	global table_robot
+	global table_function
+
+	while True:
+		str = raw_input()
+
+		if str == 'connect':
+			connect()
+
+		if str == 'disconnect':
+			disconnect()
+
+		if str == 'robot':
+			print 'The number of connected robot: %s' %len(table_robot)
+			print table_robot
+
+		if str == 'command':
+			print 'command'
+
+		if str == 'help':
+			print 'Taoge Niubi'
+
+		else:
+			print 'enter "help" for more command'
+
+def listen_robot():
+
+	global addr
+
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.bind(('', 8013))
+
+	data, addr = s.recvfrom(1024)
+
+	if data == 'connect':
+
+		print 'Received from %s:%s.' %addr
+
+		s.sendto('comfirmed', addr)
+
+		r_name = s.recv(1024)
+
+		print 'Robot %s online' %r_name
+
+		table_robot.append((r_name, addr))
+	
+
+def test():
+
+	global addr
+
+	t_command = threading.Thread(target = command, name = 'command_loop')
+
+	t_func = threading.Thread(target = func, name = 'func_loop', args = (("192.168.1.183", 7999)))
+
+	t_command.start()
+
+	t_func.start()
+
+	t_command.join()
+
+	t_func.join()
+
+if __name__ == '__main__':
+	test()

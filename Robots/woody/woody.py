@@ -6,6 +6,8 @@ import time
 import os 
 import numpy 
 
+import pypot.dynamixel
+
 class webCamera:
 	def __init__(self, resolution = (640, 480), host = ("", 7999)):
 		self.resolution = resolution;
@@ -60,3 +62,36 @@ def main():
 		cam.run(); 
 if __name__ == "__main__":
 	main();
+
+
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+def connect():
+	
+	global s
+
+	data = 'connect'
+	 
+	s.sendto(data, ('192.168.1.42', 8013))
+
+	if s.recv(1024) == 'comfirmed':
+		s.sendto('woody', ('192.168.1.42', 8013))
+
+def disconnect():
+
+	global s
+
+	data = 'disconnect'
+
+	s.sendto(data, ('192.168.1.42', 8013))
+
+	s.close()
+
+
+def test():
+
+	connect()
+
+if __name__ == '__main__':
+	test()
