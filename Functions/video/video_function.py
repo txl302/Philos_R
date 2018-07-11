@@ -44,7 +44,7 @@ class webCamConnect:
 
 						gray = cv2.cvtColor(self.image,cv2.COLOR_BGR2GRAY)
 
-						faces = face_cascade.detectMultiScale(gray, scaleFactor = 1.15, minNeighbors = 5, minSize = (150,150), flags = cv2.cv.CV_HAAR_SCALE_IMAGE)
+						faces = face_cascade.detectMultiScale(gray, scaleFactor = 1.15, minNeighbors = 5, minSize = (150,150))
 						
     						for (x,y,w,h) in faces:
 							#print x,y,w,h
