@@ -26,7 +26,7 @@ class webCamConnect:
 		self.socket.connect(self.remoteAddress); 
 	def _processImage(self): 
 		self.socket.send(struct.pack("lhh",self.src,self.resolution[0],self.resolution[1])); 
-		face_cascade = cv2.CascadeClassifier(r'./haarcascade_frontalface_default.xml')
+		face_cascade = cv2.CascadeClassifier('./haarcascade_frontalface_default.xml')
 		while(1): 
 			info = struct.unpack("lhh",self.socket.recv(12)); 
 			bufSize = info[0]; 
@@ -44,11 +44,12 @@ class webCamConnect:
 
 						gray = cv2.cvtColor(self.image,cv2.COLOR_BGR2GRAY)
 
-						faces = face_cascade.detectMultiScale(gray, scaleFactor = 1.15, minNeighbors = 5, minSize = (5,5), flags = cv2.cv.CV_HAAR_SCALE_IMAGE)
+						faces = face_cascade.detectMultiScale(gray, scaleFactor = 1.15, minNeighbors = 5, minSize = (150,150), flags = cv2.cv.CV_HAAR_SCALE_IMAGE)
 						
-    					for (x,y,w,h) in faces:
-    						#cv2.rectangle(image,(x,y),(x+w,y+w),(0,255,0),2)
-    						cv2.circle(self.image,((x+x+w)/2,(y+y+h)/2),w/2,(0,255,0),2)
+    						for (x,y,w,h) in faces:
+							#print x,y,w,h
+    							cv2.rectangle(self.image,(x,y),(x+w,y+w),(0,255,0),2)
+    							#cv2.circle(self.image,((x+x+w)/2,(y+y+h)/2),w/2,(0,255,0),2)
 
 						cv2.imshow(self.name,self.image) 
 
