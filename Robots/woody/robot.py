@@ -33,9 +33,9 @@ class webCamera:
 			return 1 
 		else :
 			return 0 
-	def _processConnection(self, client,addr): 
-		if(self.recv_config(client)==0): 
-			return
+
+	def cap(self): 
+
 		camera = cv2.VideoCapture(0) 
 		encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),self.img_quality] 
 
@@ -45,18 +45,40 @@ class webCamera:
 			result, imgencode = cv2.imencode('.jpg',self.img,encode_param) 
 			img_code = numpy.array(imgencode) 
 			self.imgdata = img_code.tostring() 
+
+
+	def send(self):
+		client,addr = self.socket.accept(); 
+ 
+		if(self.recv_config(client)==0): 
+			return
+
+	
+
+		while(1): 
 			try: 
 				client.send(struct.pack("lhh",len(self.imgdata), self.resolution[0],self.resolution[1])+self.imgdata);
 			except:
 				pass
 
 				return; 
-	def run(self): 
-		client,addr = self.socket.accept(); 
-		self._processConnection(client, addr);
 
 def main(): 
-		cam = webCamera(); 
-		cam.run(); 
+	cam = webCamera(); 
+
+	t_c = threading.Thread(target = cam.cap, name = 'cap_loop')
+	t_s1 = threading.Thread(target = cam.send, name = 'cap_loop')
+	t_s2 = threading.Thread(target = cam.send, name = 'cap_loop')
+
+	t_c.start()
+
+	t_s1.start()
+	t_s2.start()
+
+	t_c.join()
+
+	t_s1.join()
+	t_s2.join()
+
 if __name__ == "__main__":
 	main();
