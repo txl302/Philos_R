@@ -25,7 +25,7 @@ class webCamConnect:
 		self._setSocket(); 
 		self.socket.connect(self.remoteAddress); 
 	def _processImage(self): 
-		self.socket.send(struct.pack("lhh",self.src,self.resolution[0],self.resolution[1])); 
+
 		while(1): 
 			info = struct.unpack("lhh",self.socket.recv(12)); 
 			bufSize = info[0]; 
