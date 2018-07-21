@@ -35,6 +35,8 @@ class webCamera:
 
 			client.send(struct.pack("lhh",len(self.imgdata), self.resolution[0],self.resolution[1])+self.imgdata);
 
+			cv2.imshow('object', self.img)
+
 	def run(self): 
 		client,addr = self.socket.accept(); 
 		self._processConnection(client, addr);
