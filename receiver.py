@@ -23,7 +23,7 @@ stream = p.open(format=p.get_format_from_width(WIDTH),
 
 
 while True:
-    data,addr = s.recvfrom(1024)
+    data,addr = s.recvfrom(4096)
     #data = numpy.fromstring(data,dtype='uint8')
 
     print data
