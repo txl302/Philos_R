@@ -5,78 +5,41 @@ import cv2
 import time 
 import os 
 import numpy 
-
 class webCamera:
-	def __init__(self, resolution = (640, 480), host = ("", 7999)):
-		self.resolution = resolution;
-		self.host = host;
-		self.setSocket(self.host); 
-		self.img_quality = 15 
-	def setImageResolution(self, resolution):
-		self.resolution = resolution;
-	def setHost(self, host):
-		self.host = host;
-	def setSocket(self, host):
-		self.socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM);
-		self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1);
-		self.socket.bind(self.host); 
-		self.socket.listen(5); 
-		print("Server running on port:%d" % host[1]);
-	def recv_config(self,client):
-		info = struct.unpack("lhh",client.recv(12));
-		if info[0]>911:
-			self.img_quality=int(info[0])-911
-			self.resolution=list(self.resolution) 
-			self.resolution[0]=info[1] 
-			self.resolution[1]=info[2] 
-			self.resolution=tuple(self.resolution) 
-			return 1 
-		else :
-			return 0 
 
-	def cap(self): 
+	def run():
 
-		camera = cv2.VideoCapture(0) 
-		encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),self.img_quality] 
+		cam1 = cv2.VideoCapture(0)
+		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-		while(1): 
-			(grabbed, self.img) = camera.read() 
-			self.img = cv2.resize(self.img,self.resolution) 
-			result, imgencode = cv2.imencode('.jpg',self.img,encode_param) 
-			img_code = numpy.array(imgencode) 
-			self.imgdata = img_code.tostring() 
+		while True:
 
+			ret1, img1 = cam1.read()
 
-	def send(self):
-		client,addr = self.socket.accept(); 
- 
-		if(self.recv_config(client)==0): 
-			return
+			if img1 != []:
 
-		while(1): 
-			try: 
-				client.send(struct.pack("lhh",len(self.imgdata), self.resolution[0],self.resolution[1])+self.imgdata);
-			except:
-				pass
+				img1 = cv2.resize(img1,(640,480)) 
 
-				return; 
+			result, imgencode = cv2.imencode('.jpg',img1) 
+
+			print imgencode
+
+			s.sendto(imgencode, ('192.168.1.183', 9999))
+			s.sendto(imgencode, ('192.168.1.42', 9999))
+
+			if cv2.waitKey(10) == 27:
+				break
+		cv2.destroyAllwindows()	
+
+		s.close()
+
+class lis:
+
+	
 
 def main(): 
-	cam = webCamera(); 
-
-	t_c = threading.Thread(target = cam.cap, name = 'cap_loop')
-	t_s1 = threading.Thread(target = cam.send, name = 'send_loop1')
-	t_s2 = threading.Thread(target = cam.send, name = 'send_loop2')
-
-	t_c.start()
-
-	t_s1.start()
-	t_s2.start()
-
-	t_c.join()
-
-	t_s1.join()
-	t_s2.join()
+	cam = webCamera()
+	cam.run()
 
 if __name__ == "__main__":
 	main();

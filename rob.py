@@ -10,7 +10,9 @@ while True:
 
 	ret1, img1 = cam1.read()
 
-	img1 = cv2.resize(img1,(640,480)) 
+	if img1 != []:
+
+		img1 = cv2.resize(img1,(640,480)) 
 
 	result, imgencode = cv2.imencode('.jpg',img1) 
 
@@ -18,7 +20,8 @@ while True:
 
 	print imgencode
 
-	s.sendto(imgencode, ('', 9999))
+	s.sendto(imgencode, ('192.168.1.183', 9999))
+	s.sendto(imgencode, ('192.168.1.42', 9999))
 
 	#cv2.imshow('Taoge Niubi', image)
 

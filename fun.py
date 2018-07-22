@@ -5,7 +5,7 @@ import numpy
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-s.bind(('', 9999))
+s.bind(('192.168.1.183', 9999))
 
 while True:
 	data,addr = s.recvfrom(64000)
