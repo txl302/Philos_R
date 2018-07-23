@@ -12,7 +12,7 @@ while True:
 
 	if img1 != []:
 
-		img1 = cv2.resize(img1,(640,480)) 
+		img1 = cv2.resize(img1,(320,240)) 
 
 	result, imgencode = cv2.imencode('.jpg',img1) 
 
