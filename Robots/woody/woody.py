@@ -1,63 +1,52 @@
-import socket;
-import threading; 
-import struct; 
-import cv2 
-import time 
-import os 
-import numpy 
-
-import pypot.dynamixel
-
+import cv2
+import socket
+import numpy
+import threading
 
 cam1 = cv2.VideoCapture(0)
+ret1, img1 = cam1.read()
+
+if img1 != []:
+	img1 = cv2.resize(img1,(320,240)) 
+
+result, imgencode = cv2.imencode('.jpg',img1) 
+
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-while True:
+def cam():
 
-	ret1, img1 = cam1.read()
+    global imgencode
 
-	if img1 != []:
+	while True:
 
-		img1 = cv2.resize(img1,(640,480)) 
+		ret1, img1 = cam1.read()
 
-	result, imgencode = cv2.imencode('.jpg',img1) 
+		if img1 != []:
+			img1 = cv2.resize(img1,(320,240)) 
 
-	print imgencode
+		result, imgencode = cv2.imencode('.jpg',img1) 
 
-	s.sendto(imgencode, ('192.168.1.183', 9999))
-	s.sendto(imgencode, ('192.168.1.42', 9999))
+		print imgencode
 
-	if cv2.waitKey(10) == 27:
-		break
-cv2.destroyAllwindows()	
+		if cv2.waitKey(10) == 27:
+			break
+	cv2.destroyAllwindows()
 
-s.close()
-
-def connect():
-	
-	global s
-
-	data = 'connect'
-	 
-	s.sendto(data, ('192.168.1.42', 8013))
-
-	if s.recv(1024) == 'comfirmed':
-		s.sendto('woody', ('192.168.1.42', 8013))
-
-def disconnect():
-
-	global s
-
-	data = 'disconnect'
-
-	s.sendto(data, ('192.168.1.42', 8013))
-
+def send1():
+	while True
+		s.sendto(imgencode, ('192.168.1.42', 9999))
 	s.close()
 
+def send2():
+	while True:
+		s.sendto(imgencode, ('192.168.1.235', 9999))
+	s.close()
 
-def test():
+thread_c = threading.Thread(target = cam);
+thread_c.start();	
 
-	connect()
+thread_s1 = threading.Thread(target = send1);
+thread_s1.start();
 
-if __name__ == '__main__':
-	test()
+thread_s2 = threading.Thread(target = send2);
+thread_s2.start();
