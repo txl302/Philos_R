@@ -3,20 +3,28 @@ import socket
 
 import numpy
 
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-s.bind(('192.168.1.183', 9999))
+s1.bind(('192.168.1.235', 9999))
+s2.bind(('192.168.1.235', 9998))
 
 while True:
-	data,addr = s.recvfrom(64000)
+	data1,addr1 = s1.recvfrom(64000)
 
-	data = numpy.fromstring(data,dtype='uint8') 
+	data1 = numpy.fromstring(data1,dtype='uint8') 
 
-	print data
+	data2,addr2 = s2.recvfrom(64000)
 
-	image=cv2.imdecode(data,1)
+	data2 = numpy.fromstring(data2,dtype='uint8') 
 
-	cv2.imshow('Taoge Niubi', image)
+	#print data
+
+	image1=cv2.imdecode(data1,1)
+	image2=cv2.imdecode(data2,1)
+
+	cv2.imshow('Taoge Niubi 1', image1)
+	cv2.imshow('Taoge Niubi 2', image2)
 	if cv2.waitKey(10) == 27:
 		break
 s.close()
