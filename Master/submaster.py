@@ -5,6 +5,9 @@ table_robot = []
 table_function = []
 
 def listen_robot():
+	
+	global table_robot
+
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	s.bind(('', 8013))
 

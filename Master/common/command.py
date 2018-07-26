@@ -1,3 +1,6 @@
+table_function = []
+table_robot = []
+
 def command():
 
 	global table_robot
@@ -10,21 +13,22 @@ def command():
 			print 'The number of connected robot: %s' %len(table_robot)
 			print table_robot
 
-		if str == 'function':
+		elif str == 'function':
 			print 'The number of online function: %s' %len(table_function)
 			print table_function
 
-		if str == 'command':
+		elif str == 'command':
 			print 'command'
 
-		if str == 'help':
-			print 'robot'
-
+		elif str == 'help':
+			print('robot: check the status of all robots\
+				\nfucntion: check the status of all functions')
 		else:
 			print 'enter "help" for more command'
 
 def test():
-	coommand()
+
+	command()
 
 if __name__ == '__main__':
 	test()
