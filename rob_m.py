@@ -1,77 +1,53 @@
-import socket;
-import threading; 
-import struct; 
-import cv2 
-import time 
-import os 
-import numpy 
+import cv2
+import socket
 
-class webCamera:
-	def __init__(self, resolution = (640, 480), host = ("", 7999)):
-		self.resolution = resolution;
-		self.host = host;
-		self.setSocket(self.host); 
-		self.img_quality = 15 
-	def setImageResolution(self, resolution):
-		self.resolution = resolution;
-	def setHost(self, host):
-		self.host = host;
-	def setSocket(self, host):
-		self.socket_s = socket.socket(socket.AF_INET,socket.SOCK_STREAM);
-		self.socket_s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1);
-		self.socket_s.bind(self.host); 
-		self.socket_s.listen(5); 
+import numpy
 
-		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) 
-		sock.bind(("",8000))
-		sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 255)
+cam1 = cv2.VideoCapture(0)
 
-		print("Server running on port:%d" % host[1]);
-	def recv_config(self,client):
-		info = struct.unpack("lhh",client.recv(12));
-		if info[0]>911:
-			self.img_quality=int(info[0])-911
-			self.resolution=list(self.resolution) 
-			self.resolution[0]=info[1] 
-			self.resolution[1]=info[2] 
-			self.resolution=tuple(self.resolution) 
-			return 1 
-		else :
-			return 0 
-	def _processConnection(self, client,addr): 
-		if(self.recv_config(client)==0): 
-			return
-		camera = cv2.VideoCapture(0) 
-		encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),self.img_quality] 
+ret1, img1 = cam1.read()
 
-		while(1): 
+if img1 != []:
 
-			(grabbed, self.img) = camera.read() 
-			self.img = cv2.resize(self.img,self.resolution) 
-			result, imgencode = cv2.imencode('.jpg',self.img,encode_param) 
-			img_code = numpy.array(imgencode) 
-			self.imgdata = img_code.tostring() 
-			try: 
-				#client.send(struct.pack("lhh",len(self.imgdata), self.resolution[0],self.resolution[1])+self.imgdata);
-				print addr
-				print client
-				print struct.pack("lhh",len(self.imgdata), self.resolution[0],self.resolution[1])+self.imgdata
-				socket_s.sendto(struct.pack("lhh",len(self.imgdata), self.resolution[0],self.resolution[1])+self.imgdata, addr);
-				print len(self.imgdata)
-			except:
+	img1 = cv2.resize(img1,(320,240)) 
 
-				pass
+result, imgencode = cv2.imencode('.jpg',img1) 
 
-				#camera.release() 
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-				return; 
-	def run(self): 
-		client,addr = self.socket_s.accept(); 
-		self._processConnection(client, addr);
+def cam():
 
+	while True:
 
-def main(): 
-		cam = webCamera(); 
-		cam.run(); 
-if __name__ == "__main__":
-	main();
+		ret1, img1 = cam1.read()
+
+		if img1 != []:
+
+			img1 = cv2.resize(img1,(320,240)) 
+
+		result, imgencode = cv2.imencode('.jpg',img1) 
+
+		#data=cv2.imdecode(imgencode,1)
+
+		print imgencode
+
+		#cv2.imshow('Taoge Niubi', image)
+
+		if cv2.waitKey(10) == 27:
+			break
+	cv2.destroyAllwindows()	
+
+	s.close()
+
+def send1():
+
+	s.sendto(imgencode, ('192.168.1.42', 9999))
+
+thread_c = threading.Thread(target = cam);
+thread_c.start();	
+
+thread_s1 = threading.Thread(target = send1);
+thread_s1.start();
+
+thread_c.join()
+thread_s1.join()
