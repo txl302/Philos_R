@@ -3,19 +3,25 @@ import socket
 
 import numpy
 
+import threading
 cam1 = cv2.VideoCapture(0)
-
 ret1, img1 = cam1.read()
 
 if img1 != []:
 
-	img1 = cv2.resize(img1,(320,240)) 
+        img1 = cv2.resize(img1,(320,240)) 
 
 result, imgencode = cv2.imencode('.jpg',img1) 
+
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 def cam():
+
+        global imgencode
+
+
+
 
 	while True:
 
@@ -37,11 +43,21 @@ def cam():
 			break
 	cv2.destroyAllwindows()	
 
-	s.close()
+
 
 def send1():
 
-	s.sendto(imgencode, ('192.168.1.42', 9999))
+        while True:
+
+                s.sendto(imgencode, ('192.168.1.42', 9999))
+        s.close()
+
+def send2():
+
+        while True:
+
+                s.sendto(imgencode, ('192.168.1.235', 9999))
+        s.close()
 
 thread_c = threading.Thread(target = cam);
 thread_c.start();	
@@ -49,5 +65,8 @@ thread_c.start();
 thread_s1 = threading.Thread(target = send1);
 thread_s1.start();
 
-thread_c.join()
-thread_s1.join()
+thread_s2 = threading.Thread(target = send2);
+thread_s2.start();
+
+#thread_c.join()
+#thread_s1.join()
