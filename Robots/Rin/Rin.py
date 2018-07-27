@@ -3,21 +3,20 @@ import socket
 
 import numpy
 
-s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-s1.bind(('192.168.1.32', 8099))
+s.bind(('192.168.1.32', 8099))
+
 
 while True:
-	data,addr = s1.recvfrom(64000)
+	data,addr = s.recvfrom(64000)
 
-	#print data
+	f = open('good.mp3', 'wb')
 
-	image1=cv2.imdecode(data1,1)
-	image2=cv2.imdecode(data2,1)
+	f.write(data)
 
-	cv2.imshow('Taoge Niubi 1', image1)
-	cv2.imshow('Taoge Niubi 2', image2)
-	if cv2.waitKey(10) == 27:
-		break
+	f.close()
+
+	os.system("mpg321 good.mp3")
+
 s.close()
