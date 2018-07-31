@@ -10,7 +10,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 
 def hello():
-    tts = gTTS(text='chuan qi is not working.', lang='en')
+    tts = gTTS(text='Warning! Chuan qi, is not working', lang='en')
     tts.save("good.mp3")
     #os.system("mpg321 good.mp3")
 
@@ -19,8 +19,9 @@ def hello():
     data = f.read()
 
     s.sendto(data, ('192.168.1.32', 8099))
+    s.sendto(data, ('192.168.1.94', 8099))
 
-    print len(data)
+    print data
 
     f.close()
 

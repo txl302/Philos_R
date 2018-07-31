@@ -75,19 +75,44 @@ def command():
 			print 'The number of connected robot: %s' %len(table_robot)
 			print table_robot
 
-		if str == 'function':
+		elif str == 'function':
 			print 'The number of online function: %s' %len(table_function)
 			print table_function
 
-		if str == 'command':
+		elif str == 'command':
 			print 'command'
 
-		if str == 'help':
-			print 'robot'
-
+		elif str == 'help':
+			print('robot: check the status of all robots\
+				\nfucntion: check the status of all functions')
 		else:
 			print 'enter "help" for more command'
 
+
+def handle_request():
+	global table_function
+	global table_robot
+
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.bind(('',8015))
+
+	data, addr = s.recvfrom(1024)
+
+	if data == 'connect':
+
+		print 'Received from %s:%s.' %addr
+
+		s.sendto('comfirmed', addr)
+
+		f_name = s.recv(1024)
+
+		print 'Function %s online' %f_name
+
+		table_function.append((f_name, addr))
+
+	if data == 'disconnect':
+		print 'Function %s disconnect from the server' %data
+		print 'Function %s '
 
 
 def test():
