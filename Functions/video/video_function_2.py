@@ -1,5 +1,6 @@
 import cv2
 import socket
+import threading
 
 import numpy
 
@@ -13,7 +14,9 @@ def reveice_play(s,sc):
 	data,addr = s.recvfrom(64000)
 	data = numpy.fromstring(data, dtype = 'uint8')
 
-	image = imdecode(data, 1)
+	image = cv2.imdecode(data, 1)
+
+	image = cv2.resize(image, (640,480))
 
 	cv2.imshow(sc, image)
 
