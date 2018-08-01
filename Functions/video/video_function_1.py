@@ -6,8 +6,8 @@ import numpy
 s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-s1.bind(('192.168.1.235', 9999))
-s2.bind(('192.168.1.235', 9998))
+s1.bind(('192.168.1.42', 9999))
+s2.bind(('192.168.1.42', 9998))
 
 def reveice_play(s,sc):
 	data,addr = s.recvfrom(64000)
