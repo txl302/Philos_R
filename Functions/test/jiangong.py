@@ -8,7 +8,6 @@ s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 s1.bind(('192.168.1.235', 9998))
 
-
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 count = 0

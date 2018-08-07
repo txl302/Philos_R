@@ -13,17 +13,17 @@ def listen_robot():
 
 	data, addr = s.recvfrom(1024)
 
-	if data == 'connect':
+	if data.find('connect') >= 0:
 
-		print 'Received from %s:%s.' %addr
+		robot_name = data[9:]
+		print 'Robot %s is online now' %robot_name
+
+		table_robot = append((robot_name, addr))
 
 		s.sendto('comfirmed', addr)
 
-		f_name = s.recv(1024)
-
-		print 'Robot %s online' %f_name
-
-		table_function.append((f_name, addr))
+	if data == 'disconnect':
+		print 'disconnect'
 
 
 
