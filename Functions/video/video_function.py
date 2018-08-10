@@ -4,16 +4,24 @@ import threading
 
 import numpy
 
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
 s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-s1.bind(('192.168.1.115', 9999))
-s2.bind(('192.168.1.115', 9998))
+ports = [('192.168.1.115', 9999), ('192.168.1.115', 9998)]
+
+s1.bind(ports[0])
+s2.bind(ports[1])
+
+str_ports = str(ports)
 
 def init():
 
-	init_request = 'connect, visual'
-	s.sendto(imgencode, ('192.168.1.235', 9999))
+	print 'visual function initialized'
+
+	init_request = 'connect| visual|' + str_ports
+	s.sendto(init_request, ('192.168.1.235', 8014))
 
 def reveice_play(s,sc):
 	data,addr = s.recvfrom(64000)
@@ -43,10 +51,14 @@ def command():
 		str = raw_input()
 
 		if str == 'connect':
-			print 'connect'
+
+			request = 'connect| visual|' + str_ports
+			s.sendto(request, ('192.168.1.235', 8014))
 
 		elif str == 'disconnect':
-			print 'disconnect'
+			
+			request = 'disconnect| visual|' + str_ports
+			s.sendto(request, ('192.168.1.235', 8014))
 
 		elif str == 'help':
 			print 'help'
@@ -58,6 +70,9 @@ def command():
 def main():
 
 	init()
+
+	thread_c = threading.Thread(target = command)
+	thread_c.start()
 
 	thread_s1 = threading.Thread(target = play1);
 	thread_s1.start();

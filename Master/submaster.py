@@ -46,16 +46,20 @@ def listen_function():
 
 	data, addr = s.recvfrom(1024)
 
-	if data.find('connect') >= 0:
-		function_name = data[9:]
-		print 'Function %s is online now' %fucntion_name
-		table_function[fucntion_name] = addr
-		s.sendto('comfirmed', addr)
+	func = data.split('|')
 
-	elif data.find('disconnect') >= 0:
-		fucntion_name = data[12:]
-		print 'Function %s disconnect from the server' %fucntion_name
-		table_function.pop(function_name)
+	if func[0] == 'connect':
+		function_name = func[1]
+		print 'Function %s is online now' %function_name
+		table_function[function_name] = func[2]
+
+	elif func[0] == 'disconnect':
+		function_name = func[1]
+		print 'Function %s disconnect from the server' %function_name
+		table_function.pop[function_name] 
+
+	else:
+		print "unknown request"
 
 
 def robot_thread():
