@@ -31,7 +31,7 @@ def listen_robot():
 
 		answer = []
 
-		for i in range n:
+		for i in range(n):
 			answer = answer.append(table_function[request[n]])
 
 		s.sendto(answer, addr)

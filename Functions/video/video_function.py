@@ -43,10 +43,13 @@ def command():
 		str = raw_input()
 
 		if str == 'connect':
+			print 'connect'
 
 		elif str == 'disconnect':
+			print 'disconnect'
 
 		elif str == 'help':
+			print 'help'
 
 		else:
 			print 'enter "help" for more command'
