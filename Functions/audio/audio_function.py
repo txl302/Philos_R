@@ -4,9 +4,18 @@ import socket
 from gtts import gTTS
 import os
 
-
-
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+ports = [('192.168.1.115', 9999), ('192.168.1.115', 9998)]
+s1.bind(ports[0])
+s2.bind(ports[1])
+str_ports = str(ports)
+
+def init():
+	print 'visual function initialized'
+	init_request = 'connect| visual|' + str_ports
+	s.sendto(init_request, ('192.168.1.235', 8014))
 
 
 def hello():
