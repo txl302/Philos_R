@@ -1,5 +1,9 @@
 import math
 
+import socket
+import threading
+import numpy
+
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -68,8 +72,7 @@ def move_to_right(dx, dy, dz):
 def move():
    move_to_left(dx, dy, dz)
 
-def main():
-   init()
+def run():
    thread_c = threading.Thread(target = command)
    thread_c.start()
    thread_s1 = threading.Thread(target = play1);
@@ -80,5 +83,9 @@ def main():
    thread_m = threading.Thread(target = move)
    thread_m.start()
 
+def main():
+   init()
+   run()
+
 if __name__ == '__main__':
-   move()
+   main()

@@ -10,8 +10,6 @@ RATE = 44100
 
 p = pyaudio.PyAudio()
 
-
-
 stream = p.open(format=p.get_format_from_width(WIDTH),
                 channels=CHANNELS,
                 rate=RATE,

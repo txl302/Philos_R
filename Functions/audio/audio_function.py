@@ -1,5 +1,7 @@
-
 import socket
+
+import threading
+import numpy
 
 from gtts import gTTS
 import os
@@ -17,6 +19,19 @@ def init():
 	init_request = 'connect| visual|' + str_ports
 	s.sendto(init_request, ('192.168.1.235', 8014))
 
+def command():
+   while True:
+      str = raw_input()
+      if str == 'connect':
+         request = 'connect| motion|' + str_ports
+         s.sendto(request, ('192.168.1.235', 8014))
+      elif str == 'disconnect':  
+         request = 'disconnect| motion|' + str_ports
+         s.sendto(request, ('192.168.1.235', 8014))
+      elif str == 'help':
+         print 'help'
+      else:
+         print 'enter "help" for more command'
 
 def hello():
     tts = gTTS(text='Warning! Chuan qi, is not working', lang='en')
@@ -34,8 +49,5 @@ def hello():
 
     f.close()
 
-
-
 if __name__ == '__main__':
 	hello()
-

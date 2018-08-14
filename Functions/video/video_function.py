@@ -22,6 +22,7 @@ def command():
 		if str == 'connect':
 			request = 'connect| visual|' + str_ports
 			s.sendto(request, ('192.168.1.235', 8014))
+			print 's'
 		elif str == 'disconnect':	
 			request = 'disconnect| visual|' + str_ports
 			s.sendto(request, ('192.168.1.235', 8014))
@@ -49,13 +50,15 @@ def play2():
 	s2.close()
 
 def main():
-	init()
+	#init()
 	thread_c = threading.Thread(target = command)
 	thread_c.start()
 	thread_s1 = threading.Thread(target = play1);
 	thread_s1.start();
 	thread_s2 = threading.Thread(target = play2);
 	thread_s2.start();
+
+	thread_c.join()
 
 if __name__ == '__main__':
 	main()

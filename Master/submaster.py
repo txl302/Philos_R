@@ -26,14 +26,13 @@ def listen_robot():
 	elif rob[0] == 'disconnect':
 		robot_name = rob[1]
 		print 'Robot %s disconnect from the server' %robot_name
-		table_robot.pop(addr)
+		table_robot.pop(robot_name)
 
 	elif rob[0] == 'request':
 		robot_name = rob[1]
 		request = rob[2]
-		n = len(request)
 		answer = []
-		for i in range(n):
+		for i in range(len(request)):
 			answer = answer.append(table_function_p[request[n]])
 		s.sendto(answer, addr)
 
@@ -48,7 +47,7 @@ def listen_function_p():
 	elif func[0] == 'disconnect':
 		function_name = func[1]
 		print 'Function %s disconnect from the server' %function_name
-		table_function_p.pop[function_name] 
+		table_function_p.pop(function_name)
 	else:
 		print "unknown request"
 
@@ -63,17 +62,20 @@ def listen_function_a():
 	elif func[0] == 'disconnect':
 		function_name = func[1]
 		print 'Function %s disconnect from the server' %function_name
-		table_function_p.pop[function_name] 
+		table_function_p.pop(function_name)
 	else:
 		print "unknown request"
+
+def robot_checking():
+	pass
 
 def robot_thread():
 	while True:
 		listen_robot()
 
-def function_thread():
+def function_p_thread():
 	while True:
-		listen_function()
+		listen_function_p()
 
 def command():
 	global table_robot
@@ -96,14 +98,11 @@ def command():
 
 def test():
 	t_robot = threading.Thread(target = listen_robot, name = 'robot_loop')
-	t_function = threading.Thread(target = listen_function, name = 'function_loop')
+	t_function_p = threading.Thread(target = function_p_thread, name = 'function_p_loop')
 	t_command = threading.Thread(target = command, name = 'command_loop')
-	t_function.start()
+	t_function_p.start()
 	t_robot.start()
 	t_command.start()
-	t_function.join()
-	t_robot.join()
-	t_command.join()
 
 if __name__ == '__main__':
 	test()
