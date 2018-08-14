@@ -6,7 +6,25 @@ import numpy
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-ports = [('192.168.1.115', 9999), ('192.168.1.115', 9998)]
+
+ports = []
+
+def get_host_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+    finally:
+        s.close()
+    return ip
+
+lo_addr = get_host_ip()
+
+av_ports = [9998, 9999]
+
+for i in range(len(av_ports)):
+	ports[i] = (lo_addr, av_ports[i])
+
 s1.bind(ports[0])
 s2.bind(ports[1])
 str_ports = str(ports)
@@ -50,7 +68,7 @@ def play2():
 	s2.close()
 
 def main():
-	#init()
+	init()
 	thread_c = threading.Thread(target = command)
 	thread_c.start()
 	thread_s1 = threading.Thread(target = play1);

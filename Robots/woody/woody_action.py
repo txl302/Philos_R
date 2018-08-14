@@ -54,8 +54,33 @@ def hello():
     dxl_io.set_goal_position(dict(zip([2], [-5])))
     time.sleep(1)
 
-def move_to()
+def init():
+    print 'visual function initialized'
+    init_request = 'connect| visual|' + str_ports
+    s.sendto(init_request, ('192.168.1.235', 8014))
 
+def command():
+    while True:
+        str = raw_input()
+        if str == 'connect':
+            request = 'connect| visual|' + str_ports
+            s.sendto(request, ('192.168.1.235', 8014))
+            print 's'
+        elif str == 'disconnect':   
+            request = 'disconnect| visual|' + str_ports
+            s.sendto(request, ('192.168.1.235', 8014))
+        elif str == 'help':
+            print 'help'
+        else:
+            print 'enter "help" for more command'
+
+def move_to():
+    pass
+
+def main():
+    init()
+    thread_c = threading.Thread(target = command)
+    thread_c.start()
 
 if __name__ == '__main__':
     main()

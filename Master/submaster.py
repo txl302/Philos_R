@@ -6,11 +6,13 @@ table_function_p = {}
 table_function_a = {}
 
 s_r = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s_r.bind(('', 8013))
+s_r.bind(('', 8013)) #port for visual module
+
 s_p = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s_p.bind(('',8014))
+s_p.bind(('',8014)) #port for motion module
+
 s_a = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s_a.bind(('',8015))
+s_a.bind(('',8015)) #port for audio module
 
 def listen_robot():
 	global table_robot

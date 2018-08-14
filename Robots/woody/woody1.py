@@ -13,10 +13,27 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-ports = [('192.168.1.94', 9999), ('192.168.1.94', 9998)]
+ports = []
+
+def get_host_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+    finally:
+        s.close()
+    return ip
+
+lo_addr = get_host_ip()
+
+av_ports = [9998, 9999]
+
+for i in range(len(av_ports)):
+	ports[i] = (lo_addr, av_ports[i])
 
 s1.bind(ports[0])
 s2.bind(ports[1])
+
 str_ports = str(ports)
 
 imgencode = woody_vision.cam()
@@ -25,30 +42,22 @@ function_server = {}
 
 def init_check():
 	print 'self checking......'
-
-	os.system("mplayer check.mp3")
-
+	os.system("mplayer check_successful.wav")
 
 def init():
 	print 'robot %s initialing......' %rob_name
 	init_check()
-	init_request = 'connect| woody1|' + str_ports
+	init_request = 'connect| ' + rob_name + '|' + str_ports
 	s.sendto(init_request, ('192.168.1.235', 8013))
 	print 'robot %s initialized' %rob_name
 
 def request():
-
 	global function_server
-
 	print 'sending request to server'
-
 	f_request = ['visual', 'audio', 'motion']
-
 	send_request = 'connect| woody1|' + str_ports
 	s.sendto(send_request, ('192.168.1.235', 8013))
-
 	feedback = s.recvfrom(1024)
-
 	for i in range(len(f_request)):
 		function_server[f_request[i]] = feedback[i]
 
@@ -57,14 +66,9 @@ def cam():
 		global imgencode
 		imgencode = woody_vision.cam()
 
-def send1():
+def send():
 	while True:
-		s.sendto(imgencode, ('192.168.1.42', 9999))
-	s.close()
-
-def send2():
-	while True:
-		s.sendto(imgencode, ('192.168.1.115', 9999))
+		s.sendto(imgencode, function_server['visual'])
 	s.close()
 
 def audio():
@@ -80,11 +84,8 @@ def run():
 	thread_c = threading.Thread(target = cam);
 	thread_c.start();
 
-	thread_s1 = threading.Thread(target = send1);
-	thread_s1.start();
-
-	thread_s2 = threading.Thread(target = send2);
-	thread_s2.start();
+	thread_s = threading.Thread(target = send);
+	thread_s.start();
 
 	thread_a = threading.Thread(target = audio)
 	thread_a.start()
