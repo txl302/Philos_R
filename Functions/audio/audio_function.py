@@ -26,8 +26,8 @@ lo_addr = get_host_ip()
 av_ports = [9998, 9999]
 
 for i in range(len(av_ports)):
-    ports[i] = (lo_addr, av_ports[i])
-
+   ports.append((lo_addr, av_ports[i]))
+   
 s1.bind(ports[0])
 s2.bind(ports[1])
 str_ports = str(ports)

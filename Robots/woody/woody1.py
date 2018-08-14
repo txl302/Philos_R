@@ -14,7 +14,6 @@ s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 ports = []
-
 def get_host_ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -23,13 +22,10 @@ def get_host_ip():
     finally:
         s.close()
     return ip
-
 lo_addr = get_host_ip()
-
 av_ports = [9998, 9999]
-
 for i in range(len(av_ports)):
-	ports[i] = (lo_addr, av_ports[i])
+   ports.append((lo_addr, av_ports[i]))
 
 s1.bind(ports[0])
 s2.bind(ports[1])
@@ -42,14 +38,20 @@ function_server = {}
 
 def init_check():
 	print 'self checking......'
-	os.system("mplayer check_successful.wav")
+	os.system("mplayer speaker_checking.wav")
+
+	woody_action.hello()
 
 def init():
 	print 'robot %s initialing......' %rob_name
+
 	init_check()
+
 	init_request = 'connect| ' + rob_name + '|' + str_ports
 	s.sendto(init_request, ('192.168.1.235', 8013))
 	print 'robot %s initialized' %rob_name
+
+	os.system("mplayer check_successful.wav")
 
 def request():
 	global function_server
