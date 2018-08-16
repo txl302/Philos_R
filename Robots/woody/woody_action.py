@@ -32,55 +32,28 @@ dxl_io.set_moving_speed(dict(zip([3,8], itertools.repeat(25))))
     
 
 #set stater pose for each motor
-start_pose=[ -44.13, -5.43, 38.86, 9.24, 35.63, 24.49, 51.47, 50.0, -79.33, 52.64, -112.76, -140.91]
+starting_pose=[40.03, -8.65, 41.79, 20.97, -19.5, -47.36, -36.51, -38.86, 72.87, 25.95, 29.47, 46.77]
+pose1 = [21.26, 21.26, 43.26, 20.97, -18.91, -47.36, -36.51, -10.41, 69.35, 9.24, 29.47, 47.07]
+pose2 = [61.44, 21.26, 9.82, 35.92, -4.55, -47.36, -46.19, -42.96, 67.01, 13.34, 29.47, 46.77]
 
-#define functions of different behavior
-def hello():
-    dxl_io.set_goal_position(dict(zip(ids, start_pose)))
+def init_check():
+    dxl_io.set_goal_position(dict(zip(ids, starting_pose)))
     time.sleep(1.5)
-
-    dxl_io.set_goal_position(dict(zip([2], [-5])))
-    time.sleep(1)
-    dxl_io.set_goal_position(dict(zip([2], [10])))
-    time.sleep(1)
-    dxl_io.set_goal_position(dict(zip([2], [-5])))
-    time.sleep(1)
-    dxl_io.set_goal_position(dict(zip([2], [10])))
-    time.sleep(1)
-    dxl_io.set_goal_position(dict(zip([2], [-5])))
-    time.sleep(1)
-    dxl_io.set_goal_position(dict(zip([2], [10])))
-    time.sleep(1)
-    dxl_io.set_goal_position(dict(zip([2], [-5])))
-    time.sleep(1)
-
-def init():
-    print 'visual function initialized'
-    init_request = 'connect| visual|' + str_ports
-    s.sendto(init_request, ('192.168.1.235', 8014))
-
-def command():
-    while True:
-        str = raw_input()
-        if str == 'connect':
-            request = 'connect| visual|' + str_ports
-            s.sendto(request, ('192.168.1.235', 8014))
-            print 's'
-        elif str == 'disconnect':   
-            request = 'disconnect| visual|' + str_ports
-            s.sendto(request, ('192.168.1.235', 8014))
-        elif str == 'help':
-            print 'help'
-        else:
-            print 'enter "help" for more command'
+    dxl_io.set_goal_position(dict(zip(ids, pose1)))
+    time.sleep(1.5)
+    dxl_io.set_goal_position(dict(zip(ids, starting_pose)))
+    time.sleep(1.5)
+    dxl_io.set_goal_position(dict(zip(ids, pose2)))
+    time.sleep(1.5)
+    dxl_io.set_goal_position(dict(zip(ids, starting_pose)))
+    
 
 def move_to():
     pass
 
 def main():
-    init()
-    thread_c = threading.Thread(target = command)
-    thread_c.start()
+    init_check()
+
 
 if __name__ == '__main__':
     main()

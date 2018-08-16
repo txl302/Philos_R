@@ -2,6 +2,7 @@ import cv2
 import socket
 import numpy
 import threading
+import os
 
 import woody_vision
 import woody_action
@@ -40,7 +41,7 @@ def init_check():
 	print 'self checking......'
 	os.system("mplayer speaker_checking.wav")
 
-	woody_action.hello()
+	woody_action.init_check()
 
 def init():
 	print 'robot %s initialing......' %rob_name

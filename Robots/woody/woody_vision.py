@@ -1,7 +1,7 @@
 import cv2
 import numpy
 
-cam1 = cv2.VideoCapture(1)
+cam1 = cv2.VideoCapture(0)
 
 def cam():
 	ret1, img1 = cam1.read()
