@@ -2,10 +2,7 @@ import math
 
 def move_to_left(dx, dy, dz):
 
-   L1 = 70;
-   L2 = 160;
-   L3 = 40;
-   L4 = 210;
+   L1 = 70; L2 = 160; L3 = 40; L4 = 210;
 
    if dz<=0:
       theta1 = math.atan(-dz/dx)
@@ -34,14 +31,10 @@ def move_to_left(dx, dy, dz):
       beta = math.atan(K2/K3);
       theta2 = beta-math.atan(dyy/dxx)
 
-   theta1 = theta1*180/math.pi
-   theta2 = theta2*180/math.pi
-   theta3 = theta3*180/math.pi
-
    return [theta1, theta2, theta3]
 
 def main():
-   print move_to_left(100, 0, -100)
+   print move_to_left(150,150,150)
 
 if __name__ == '__main__':
    main()
