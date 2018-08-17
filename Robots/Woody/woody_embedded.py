@@ -2,8 +2,12 @@ import os
 import time
 import random
 
-import woody_action
 import woody_vision
+
+try:
+	import woody_action
+except:
+	pass
 
 def check_env():
 

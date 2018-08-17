@@ -4,13 +4,14 @@ import numpy
 import threading
 import os
 import time
+import getpass
 
-from Woody import woody_motion
 from Woody import woody_vision
-from Woody import woody_action
+from Woody import woody_motion
 from Woody import woody_embedded
 
 rob_name = 'woody1'
+user_name = getpass.getuser()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -36,16 +37,35 @@ s2.bind(ports[1])
 
 str_ports = str(ports)
 
-imgencode = woody_vision.cam()
+imgencode = []
 
 function_server = {}
 
 def init_check():
 	print 'self checking......'
-	os.system("mplayer /home/pi/Philos_R/Robots/Woody/speaker_checking.wav")
+	try:
+		os.system("mplayer /home/"+user_name+"/Philos_R/Robots/Woody/speaker_checking.wav")
+	except:
+		pass
 	time.sleep(2)
 
-	woody_action.init_check()
+	try:
+		from Woody import woody_action
+		print "motion module detected"
+		try:
+			woody_action.init_check()
+			print "motion unit ready"
+		except:
+			print "motion unit error"
+	except:
+		print "motion module offline"
+	time.sleep(2)
+
+	try:
+		imgencode = woody_vision.cam()
+		print "camera ready"
+	except:
+		print "camera offline"
 	time.sleep(2)
 
 def init():
@@ -57,7 +77,7 @@ def init():
 	s.sendto(init_request, ('192.168.1.235', 8013))
 	print 'robot %s initialized' %rob_name
 
-	os.system("mplayer /home/pi/Philos_R/Robots/Woody/check_successful.wav")
+	os.system("mplayer /home/"+user_name+"/Philos_R/Robots/Woody/check_successful.wav")
 
 def request():
 	global function_server
@@ -106,7 +126,7 @@ def test():
         woody_action.move_to([3,4,5], pose)
 
 def main():
-        #test()
+    #test()
 	init()
 
 	#request()
