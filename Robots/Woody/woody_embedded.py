@@ -33,15 +33,15 @@ def look_around():
 		time_total = time_total + time_p
 
 def sing_a_song():
-	d = os.listdir(os.getcwd() + '/songs/')
+	d = os.listdir('/home/pi/Philos_R/Robots/Woody/songs/')
 	song_name = d[random.randint(0, len(d)-1)]
-	os.system('mplayer ' + os.getcwd() + '/songs/'+ song_name)
+	os.system('mplayer ' + '/home/pi/Philos_R/Robots/Woody/songs/' + song_name)
 	time.sleep(5)
 
 def self_speaking():
-	d = os.listdir(os.getcwd() + '/self_speaking/')
+	d = os.listdir('/home/pi/Philos_R/Robots/Woody/self_speaking/')
 	words_name = d[random.randint(0, len(d)-1)]
-	os.system('mplayer ' + os.getcwd() + '/self_speaking/'+ words_name)
+	os.system('mplayer ' + '/home/pi/Philos_R/Robots/Woody/self_speaking/' + words_name)
 	time.sleep(5)
 
 def motion_detection():

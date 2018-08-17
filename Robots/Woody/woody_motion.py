@@ -16,6 +16,7 @@ def move_to_left(dx, dy, dz):
       dxx = dx/math.cos(theta1);
       dyy = dy - L1;
       K1 = (dxx**2+dyy**2-L2**2-(L3+L4)**2)/(2*L2*(L3+L4));
+      print K1
       theta3 = math.acos(K1)                                            
 
       K2 = (L3+L4)*math.sin(math.pi/2-theta3);
@@ -37,12 +38,10 @@ def move_to_left(dx, dy, dz):
    theta2 = theta2*180/math.pi
    theta3 = theta3*180/math.pi
 
-   print theta1,theta2,theta3
-
-   return theta1, theta2, theta3
+   return [theta1, theta2, theta3]
 
 def main():
-   print move_to_left(100, 100, 100)
+   print move_to_left(100, 0, -100)
 
 if __name__ == '__main__':
    main()

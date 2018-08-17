@@ -3,11 +3,12 @@ import socket
 import numpy
 import threading
 import os
+import time
 
+from Woody import woody_motion
 from Woody import woody_vision
 from Woody import woody_action
-
-from woody import woody_embedded
+from Woody import woody_embedded
 
 rob_name = 'woody1'
 
@@ -41,9 +42,11 @@ function_server = {}
 
 def init_check():
 	print 'self checking......'
-	os.system("mplayer speaker_checking.wav")
+	os.system("mplayer /home/pi/Philos_R/Robots/Woody/speaker_checking.wav")
+	time.sleep(2)
 
 	woody_action.init_check()
+	time.sleep(2)
 
 def init():
 	print 'robot %s initialing......' %rob_name
@@ -54,7 +57,7 @@ def init():
 	s.sendto(init_request, ('192.168.1.235', 8013))
 	print 'robot %s initialized' %rob_name
 
-	os.system("mplayer check_successful.wav")
+	os.system("mplayer /home/pi/Philos_R/Robots/Woody/check_successful.wav")
 
 def request():
 	global function_server
@@ -98,7 +101,12 @@ def run():
 	thread_m = threading.Thread(target = move)
 	thread_m.start()
 
+def test():
+        pose = woody_motion.move_to_left(50, 50, 50)
+        woody_action.move_to([3,4,5], pose)
+
 def main():
+        #test()
 	init()
 
 	#request()
@@ -107,7 +115,6 @@ def main():
 	while True:
 		woody_embedded.idle()
 	
-
 if __name__ == '__main__':
 	main()
 
