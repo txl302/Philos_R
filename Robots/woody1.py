@@ -43,7 +43,7 @@ def init_check():
 	print 'self checking......'
 	os.system("mplayer speaker_checking.wav")
 
-	woody_embedded.init_check()
+	woody_action.init_check()
 
 def init():
 	print 'robot %s initialing......' %rob_name
@@ -100,8 +100,13 @@ def run():
 
 def main():
 	init()
+
 	#request()
 	#run()
+
+	while True:
+		woody_embedded.idle()
+	
 
 if __name__ == '__main__':
 	main()

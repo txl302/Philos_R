@@ -47,20 +47,19 @@ def self_speaking():
 def motion_detection():
 	pass
 
-
 def idle():
-	while True:
-		n = random.randint(1,100)
-		print n
-		if n < 10:
-			sing_a_song()
- 		elif n < 20:
-			self_speaking()
-		else:
-			look_around()
+	n = random.randint(1,100)
+	print n
+	if n < 10:
+		sing_a_song()
+	elif n < 20:
+		self_speaking()
+	else:
+		look_around()
 
 def main():
-	idle()
+	while True:
+		idle()
 
 if __name__ == '__main__':
 	main()

@@ -29,7 +29,6 @@ dxl_io.set_moving_speed(speed)
 dxl_io.set_moving_speed(dict(zip([1,2], itertools.repeat(55))))
 dxl_io.set_moving_speed(dict(zip([3,8], itertools.repeat(25))))
     
-
 #set stater pose for each motor
 starting_pose=[40.03, -8.65, 41.79, 20.97, -19.5, -47.36, -36.51, -38.86, 72.87, 25.95, 29.47, 46.77]
 pose1 = [21.26, 21.26, 43.26, 20.97, -18.91, -47.36, -36.51, -10.41, 69.35, 9.24, 29.47, 47.07]
@@ -46,13 +45,11 @@ def init_check():
     time.sleep(1.5)
     dxl_io.set_goal_position(dict(zip(ids, starting_pose)))
     
-
 def move_to(m_id, pose):
     dxl_io.set_goal_position(dict(zip(m_id, pose)))
 
 def main():
     init_check()
-
 
 if __name__ == '__main__':
     main()
