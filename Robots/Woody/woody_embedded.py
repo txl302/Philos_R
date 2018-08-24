@@ -27,12 +27,15 @@ def check_env():
 	woody_action.move_to([2], [])
 	time.sleep(2)
 
+def random_look():
+	pose = [random.uniform(1, 80), random.uniform(-10, 20)]
+	woody_action.move_to([1,2], pose)
+
 def look_around():
 	time_total = 0
 	while time_total < 60:
-		pose = [random.uniform(1, 80), random.uniform(-10, 20)]
-		woody_action.move_to([1,2], pose)
 		time_p = random.uniform(1,5)
+		random_look()
 		time.sleep(time_p)
 		time_total = time_total + time_p
 

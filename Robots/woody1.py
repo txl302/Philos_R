@@ -15,8 +15,8 @@ user_name = getpass.getuser()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s_a = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s_v = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 ports = []
 def get_host_ip():
@@ -41,8 +41,26 @@ imgencode = []
 
 function_server = {}
 
+visual_flag = 0
+motion_flag = 0
+audio_flag = 0
+
 def init_check():
+
+	global visual_flag
+	global motion_flag
+	global audio_flag
+
 	print 'self checking......'
+
+	try:
+		imgencode = woody_vision.cam()
+		print "camera ready"
+	except:
+		print "camera offline"
+
+	woody_embedded.random_look()
+
 	try:
 		os.system("mplayer /home/"+user_name+"/Philos_R/Robots/Woody/speaker_checking.wav")
 	except:
@@ -61,11 +79,7 @@ def init_check():
 		print "motion module offline"
 	time.sleep(2)
 
-	try:
-		imgencode = woody_vision.cam()
-		print "camera ready"
-	except:
-		print "camera offline"
+
 	time.sleep(2)
 
 def init():
@@ -94,10 +108,10 @@ def cam():
 		global imgencode
 		imgencode = woody_vision.cam()
 
-def send():
+def v_send():
 	while True:
-		s.sendto(imgencode, function_server['visual'])
-	s.close()
+		s_v.sendto(imgencode, function_server['visual'])
+	s_v.close()
 
 def audio():
 	pass
@@ -112,8 +126,8 @@ def run():
 	thread_c = threading.Thread(target = cam);
 	thread_c.start();
 
-	thread_s = threading.Thread(target = send);
-	thread_s.start();
+	thread_v_s = threading.Thread(target = v_send);
+	thread_v_s.start();
 
 	thread_a = threading.Thread(target = audio)
 	thread_a.start()
