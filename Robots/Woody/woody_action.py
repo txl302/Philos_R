@@ -49,7 +49,8 @@ def move_to(m_id, pose):
     dxl_io.set_goal_position(dict(zip(m_id, pose)))
 
 def main():
-    init_check()
+    #init_check()
+    move_to([3,4,5], [-45.0, 54.13358692001617, -27.306476660380607])
 
 if __name__ == '__main__':
     main()

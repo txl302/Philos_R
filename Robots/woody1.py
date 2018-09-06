@@ -7,8 +7,9 @@ import time
 import getpass
 
 from Woody import woody_vision
-from Woody import woody_motion
-from Woody import woody_embedded
+#from Woody import woody_action
+#from Woody import woody_motion
+#from Woody import woody_embedded
 
 rob_name = 'woody1'
 user_name = getpass.getuser()
@@ -17,8 +18,10 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 s_a = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s_v = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
 se = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 ports = []
 def get_host_ip():
@@ -143,16 +146,21 @@ def test():
         woody_action.move_to([3,4,5], pose)
 
 def send_to_emotion():
+        #print imgencode
+        global imgencode
 	while True:
-		se.sendto(imgencode, (192.168.1.71, 9901))
+                print 111
+		imgencode = woody_vision.cam()
+		se.sendto(imgencode, ("192.168.1.71", 9901))
 	se.close()
 
 def main():
     #test()
-	init()
+	#init()
 
 	#request()
 	#run()
+
 	send_to_emotion()
 
 	

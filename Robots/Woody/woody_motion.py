@@ -7,10 +7,9 @@ def move_to_left(dx, dy, dz):
    L3 = 40;
    L4 = 210;
 
-   if dz<=0:
-      theta1 = math.atan(-dz/dx)
-   else:
-      theta1 = math.atan(dz/dx)
+
+   theta1 = math.atan(dz/dx)
+
 
    if dy>0:
       dxx = dx/math.cos(theta1);
@@ -38,10 +37,15 @@ def move_to_left(dx, dy, dz):
    theta2 = theta2*180/math.pi
    theta3 = theta3*180/math.pi
 
+   theta1 = -theta1
+   theta2 = -theta2 + 90
+   theta3 = theta3 - 90
+   
+
    return [theta1, theta2, theta3]
 
 def main():
-   print move_to_left(100, 0, -100)
+   print move_to_left(200.0, 0, -220.0)
 
 if __name__ == '__main__':
    main()

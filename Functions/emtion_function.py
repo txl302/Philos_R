@@ -28,7 +28,7 @@ cap=cv2.VideoCapture(0)
 
 def reveice_play(s,sc):
 	data,addr = s.recvfrom(64000)
-	data = numpy.fromstring(data, dtype = 'uint8')
+	data = np.fromstring(data, dtype = 'uint8')
 	image = cv2.imdecode(data, 1)
 	image = cv2.resize(image, (640,480))
 	cv2.imshow(sc, image)
@@ -37,7 +37,7 @@ def reveice_play(s,sc):
 def reveice_proc(s,sc):
 	while(True):
 		data,addr = s.recvfrom(64000)
-		data = numpy.fromstring(data, dtype = 'uint8')
+		data = np.fromstring(data, dtype = 'uint8')
 		image = cv2.imdecode(data, 1)
 		frame = cv2.resize(image, (320, 240))
 		[xlist, ylist] = rtd.get_landmarks(frame,detector,predictor)
