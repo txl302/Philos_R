@@ -1,6 +1,7 @@
 import cv2
 import PIL.Image, PIL.ImageTk
 import time
+#import real_time_class
 import glob
 import random
 import dlib
@@ -9,65 +10,18 @@ import math
 import itertools
 from sklearn.svm import SVC
 import PIL
+#from PIL import Image
 from sklearn.externals import joblib
 
 class real_time_detection():
-    def __init__(self):
-        emotions = ["anger",  "disgust" ,"fear","happiness", "neutral", "sadness", "surprise"] #Emotion list
-        self.detector = dlib.get_frontal_face_detector() #Face detector
-        self.predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-        w1=0.75
-        w2=1-w1
-            
-        cap=cv2.VideoCapture(0)
 
-        while(True):
-            ret,frame=cap.read()
-            frame = cv2.resize(frame, (320, 240))
-
-            [xlist, ylist] = self.get_landmarks(frame)
-            vec_landmark = self.get_vectorized_landmark(frame)*w1
-            realtime_data = np.array([])
-           
-            if (xlist.size) and (vec_landmark.size):
-                Norm_AU_feature = self.extract_AU(xlist,ylist)*w2
-                vec_AU = np.concatenate((Norm_AU_feature,vec_landmark))
-                vec_AU= ((vec_AU-np.min(vec_AU))/np.ptp(vec_AU))
-                realtime_data = np.concatenate((realtime_data,vec_AU))
-
-
-                clf = joblib.load('landmark_SVM.pkl') 
-                Y = clf.predict([realtime_data])
-
-                if Y == 0:
-                    print 'anger'
-                if Y ==1:
-                    print 'disgust'
-                if Y == 2:
-                    print 'fear'
-                if Y ==3:
-                    print 'happiness'
-                if Y==4:
-                    print 'neutral'
-                if Y ==5:
-                    print 'sadness'
-                if Y==6:
-                    print 'surprise'
-
-            cv2.imshow('frame',frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-        cap.release()
-        cv2.destroyAllWindows()
-
-    def get_landmarks(self,image):
+    def get_landmarks(self,image,detector,predictor):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
         clahe_image = clahe.apply(gray)
-        detections = self.detector(clahe_image, 1)
+        detections = detector(clahe_image, 1)
         for k,d in enumerate(detections): #For all detected face instances individually
-            shape = self.predictor(clahe_image, d) #Draw Facial Landmarks with the predictor class
+            shape = predictor(clahe_image, d) #Draw Facial Landmarks with the predictor class
             xlist = []
             ylist = []
             landmarks= []
@@ -98,6 +52,7 @@ class real_time_detection():
             xlist = np.array(xlist,dtype = np.float64)
             ylist = np.array(ylist,dtype = np.float64)
 
+
         if len(detections) > 0:
             return xlist, ylist
         else: #If no faces are detected, return error message to other function to handle
@@ -127,6 +82,7 @@ class real_time_detection():
                 x = np.concatenate((x,[xlist[j]]))
                 y = np.concatenate((y,[ylist[j]]))
         return x, y
+
 
     def extract_AU(self,xlist,ylist):
         AU_feature = []
@@ -210,7 +166,9 @@ class real_time_detection():
 
         Norm_AU_feature = (AU_feature-np.min(AU_feature))/np.ptp(AU_feature)
 
+
         return Norm_AU_feature
+
 
     def get_average_curvature(self,AU_xlist,AU_ylist):
         K = []
@@ -219,19 +177,23 @@ class real_time_detection():
         P_1 = np.poly1d.deriv(P)
         P_2 = np.poly1d.deriv(P_1)
         for i in range(len(AU_xlist)):
+
             Y = 1+math.pow(P_1(AU_xlist[i]),2)
             Y = math.pow(Y,1.5)
             K.append(P_2(AU_xlist[i])/Y)
+        # m_K = np.mean(K)
         m_K = K
         return m_K
 
-    def get_vectorized_landmark(self,image):
+        
+
+    def get_vectorized_landmark(self,image,detector,predictor):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
         clahe_image = clahe.apply(gray)
-        detections = self.detector(clahe_image, 1)
+        detections = detector(clahe_image, 1)
         for k,d in enumerate(detections): #For all detected face instances individually
-            shape = self.predictor(image, d) #Draw Facial Landmarks with the predictor class
+            shape = predictor(image, d) #Draw Facial Landmarks with the predictor class
             xlist = []
             ylist = []
             for i in range(0,68): #Store X and Y coordinates in two lists
@@ -244,6 +206,8 @@ class real_time_detection():
             landmarks_dist = []
             landmarks_theta = []
             for x, y, w, z in zip(xcentral, ycentral, xlist, ylist):
+                # landmarks_vectorized.append(w)
+                # landmarks_vectorized.append(z)
                 meannp = np.asarray((ymean,xmean))
                 coornp = np.asarray((z,w))
                 dist = np.linalg.norm(coornp-meannp)
@@ -264,5 +228,72 @@ class real_time_detection():
             landmarks_vectorized = np.array([])
         return landmarks_vectorized
 
-if __name__ == '__main__':
-    real_time_detection()
+
+emotions = ["anger",  "disgust" ,"fear","happiness", "neutral", "sadness", "surprise"] #Emotion list
+
+
+#video_capture = cv2.VideoCapture(0) #Webcam object
+detector = dlib.get_frontal_face_detector() #Face detector
+predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+#self.expression=[]
+
+
+w1=0.75
+w2=1-w1
+rtd = real_time_detection()
+cap=cv2.VideoCapture(0)
+
+while(True):
+    ret,frame=cap.read()
+    #frame=cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+
+    frame = cv2.resize(frame, (320, 240))
+
+    [xlist, ylist] = rtd.get_landmarks(frame,detector,predictor)
+    vec_landmark = rtd.get_vectorized_landmark(frame,detector,predictor)*w1
+    realtime_data = np.array([])
+   
+    if (xlist.size) and (vec_landmark.size):
+        Norm_AU_feature = rtd.extract_AU(xlist,ylist)*w2
+        vec_AU = np.concatenate((Norm_AU_feature,vec_landmark))
+        vec_AU= ((vec_AU-np.min(vec_AU))/np.ptp(vec_AU))
+        realtime_data = np.concatenate((realtime_data,vec_AU))
+
+
+        clf = joblib.load('landmark_SVM.pkl') 
+        Y = clf.predict([realtime_data])
+
+
+        #self.label.config(fg="red")
+            #print 'hi'
+        if Y == 0:
+            print 'anger'
+        if Y ==1:
+            print 'disgust'
+
+        if Y == 2:
+
+            print 'fear'
+        if Y ==3:
+                #v.set("happiness")
+                #self.expression.append(3)
+            print 'happiness'
+        if Y==4:
+                #v.set("neutral")
+                #self.expression.append(4)
+            print 'neutral'
+        if Y ==5:
+                #v.set("sadness")
+                #self.expression.append(5)
+            print 'sadness'
+        if Y==6:
+                #v.set("surprise")
+                #self.expression.append(6)
+            print 'surprise'
+
+    cv2.imshow('frame',frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()

@@ -18,6 +18,8 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s_a = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s_v = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+se = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
 ports = []
 def get_host_ip():
     try:
@@ -139,6 +141,11 @@ def run():
 def test():
         pose = woody_motion.move_to_left(50, 50, 50)
         woody_action.move_to([3,4,5], pose)
+
+def send_to_emotion():
+	while True:
+		se.sendto(imgencode, (192.168.1.115, 8011))
+	se.close()
 
 def main():
     #test()
