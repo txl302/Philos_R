@@ -1,5 +1,6 @@
 import socket
 import threading
+import time
 
 table_robot = {}
 table_function_p = {}
@@ -13,6 +14,18 @@ s_p.bind(('',8014)) #port for motion module
 
 s_a = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s_a.bind(('',8015)) #port for audio module
+
+def broadcast():
+
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+	PORT = 1060
+	network = '<broadcast>'
+	while True:
+		s.sendto('This is master!', (network, PORT))
+		print 1
+		time.sleep(5)
 
 def listen_robot():
 	global table_robot
@@ -98,13 +111,19 @@ def command():
 		else:
 			print 'enter "help" for more command'
 
-def test():
+def main():
+	t_broadcast = threading.Thread(target = broadcast, name = 'broadcast_loop')
 	t_robot = threading.Thread(target = listen_robot, name = 'robot_loop')
 	t_function_p = threading.Thread(target = function_p_thread, name = 'function_p_loop')
 	t_command = threading.Thread(target = command, name = 'command_loop')
+
+	t_broadcast.start()
 	t_function_p.start()
 	t_robot.start()
 	t_command.start()
+
+def test():
+	broadcast()
 
 if __name__ == '__main__':
 	test()

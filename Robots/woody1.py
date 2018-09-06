@@ -27,6 +27,7 @@ def get_host_ip():
     finally:
         s.close()
     return ip
+    
 lo_addr = get_host_ip()
 av_ports = [9998, 9999]
 for i in range(len(av_ports)):
@@ -151,5 +152,3 @@ def main():
 	
 if __name__ == '__main__':
 	main()
-
-

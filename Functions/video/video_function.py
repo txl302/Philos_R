@@ -9,7 +9,24 @@ s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 ports = []
 
-def get_host_ip():
+master = {}
+
+def search_master():
+
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+	PORT = 1060
+
+	s.bind(('', PORT))
+
+	while master == {}:
+		data, address = s.recvfrom(65535)
+    	master[address] = data
+    	print data, address
+    	print master
+
+def get_local_ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('8.8.8.8', 80))
@@ -18,7 +35,7 @@ def get_host_ip():
         s.close()
     return ip
 
-lo_addr = get_host_ip()
+lo_addr = get_local_ip()
 
 av_ports = [9998, 9999]
 
@@ -78,5 +95,8 @@ def main():
 
 	thread_c.join()
 
+def test():
+	search_master()
+
 if __name__ == '__main__':
-	main()
+	test()
