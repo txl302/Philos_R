@@ -228,72 +228,76 @@ class real_time_detection():
             landmarks_vectorized = np.array([])
         return landmarks_vectorized
 
+def main():
 
-emotions = ["anger",  "disgust" ,"fear","happiness", "neutral", "sadness", "surprise"] #Emotion list
-
-
-#video_capture = cv2.VideoCapture(0) #Webcam object
-detector = dlib.get_frontal_face_detector() #Face detector
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-#self.expression=[]
+    emotions = ["anger",  "disgust" ,"fear","happiness", "neutral", "sadness", "surprise"] #Emotion list
 
 
-w1=0.75
-w2=1-w1
-rtd = real_time_detection()
-cap=cv2.VideoCapture(0)
-
-while(True):
-    ret,frame=cap.read()
-    #frame=cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
-
-    frame = cv2.resize(frame, (320, 240))
-
-    [xlist, ylist] = rtd.get_landmarks(frame,detector,predictor)
-    vec_landmark = rtd.get_vectorized_landmark(frame,detector,predictor)*w1
-    realtime_data = np.array([])
-   
-    if (xlist.size) and (vec_landmark.size):
-        Norm_AU_feature = rtd.extract_AU(xlist,ylist)*w2
-        vec_AU = np.concatenate((Norm_AU_feature,vec_landmark))
-        vec_AU= ((vec_AU-np.min(vec_AU))/np.ptp(vec_AU))
-        realtime_data = np.concatenate((realtime_data,vec_AU))
+    #video_capture = cv2.VideoCapture(0) #Webcam object
+    detector = dlib.get_frontal_face_detector() #Face detector
+    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+    #self.expression=[]
 
 
-        clf = joblib.load('landmark_SVM.pkl') 
-        Y = clf.predict([realtime_data])
+    w1=0.75
+    w2=1-w1
+    rtd = real_time_detection()
+    cap=cv2.VideoCapture(0)
+
+    while(True):
+        ret,frame=cap.read()
+        #frame=cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+
+        frame = cv2.resize(frame, (320, 240))
+
+        [xlist, ylist] = rtd.get_landmarks(frame,detector,predictor)
+        vec_landmark = rtd.get_vectorized_landmark(frame,detector,predictor)*w1
+        realtime_data = np.array([])
+       
+        if (xlist.size) and (vec_landmark.size):
+            Norm_AU_feature = rtd.extract_AU(xlist,ylist)*w2
+            vec_AU = np.concatenate((Norm_AU_feature,vec_landmark))
+            vec_AU= ((vec_AU-np.min(vec_AU))/np.ptp(vec_AU))
+            realtime_data = np.concatenate((realtime_data,vec_AU))
 
 
-        #self.label.config(fg="red")
-            #print 'hi'
-        if Y == 0:
-            print 'anger'
-        if Y ==1:
-            print 'disgust'
+            clf = joblib.load('landmark_SVM.pkl') 
+            Y = clf.predict([realtime_data])
 
-        if Y == 2:
 
-            print 'fear'
-        if Y ==3:
-                #v.set("happiness")
-                #self.expression.append(3)
-            print 'happiness'
-        if Y==4:
-                #v.set("neutral")
-                #self.expression.append(4)
-            print 'neutral'
-        if Y ==5:
-                #v.set("sadness")
-                #self.expression.append(5)
-            print 'sadness'
-        if Y==6:
-                #v.set("surprise")
-                #self.expression.append(6)
-            print 'surprise'
+            #self.label.config(fg="red")
+                #print 'hi'
+            if Y == 0:
+                print 'anger'
+            if Y ==1:
+                print 'disgust'
 
-    cv2.imshow('frame',frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+            if Y == 2:
 
-cap.release()
-cv2.destroyAllWindows()
+                print 'fear'
+            if Y ==3:
+                    #v.set("happiness")
+                    #self.expression.append(3)
+                print 'happiness'
+            if Y==4:
+                    #v.set("neutral")
+                    #self.expression.append(4)
+                print 'neutral'
+            if Y ==5:
+                    #v.set("sadness")
+                    #self.expression.append(5)
+                print 'sadness'
+            if Y==6:
+                    #v.set("surprise")
+                    #self.expression.append(6)
+                print 'surprise'
+
+        cv2.imshow('frame',frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    main()
