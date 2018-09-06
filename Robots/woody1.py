@@ -144,7 +144,7 @@ def test():
 
 def send_to_emotion():
 	while True:
-		se.sendto(imgencode, (192.168.1.115, 8011))
+		se.sendto(imgencode, (192.168.1.115, 9901))
 	se.close()
 
 def main():
@@ -153,9 +153,8 @@ def main():
 
 	#request()
 	#run()
+	send_to_emotion()
 
-	while True:
-		woody_embedded.idle()
 	
 if __name__ == '__main__':
 	main()

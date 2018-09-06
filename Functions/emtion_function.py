@@ -1,70 +1,29 @@
+from Emotion import detection
+import getpass
+import dlib
 import cv2
-import socket
-import threading
-import numpy
+import numpy as np
+from sklearn.externals import joblib
 
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-ports = []
+s1.bind(('192.168.1.115', 9901))
 
-master = {}
 
-def search_master():
+emotions = ["anger",  "disgust" ,"fear","happiness", "neutral", "sadness", "surprise"] #Emotion list
 
-	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+user_name = getpass.getuser()
+#video_capture = cv2.VideoCapture(0) #Webcam object
+detector = dlib.get_frontal_face_detector() #Face detector
+predictor = dlib.shape_predictor("/home/"+user_name+"/Philos_R/Functions/Emotion/shape_predictor_68_face_landmarks.dat")
+#predictor = dlib.shape_predictor("/home/liutao/Philos_R/Functions/Emotion/shape_predictor_68_face_landmarks.dat")
+#self.expression=[]
 
-	PORT = 1060
+w1=0.75
+w2=1-w1
+rtd = detection.real_time_detection()
+cap=cv2.VideoCapture(0)
 
-	s.bind(('', PORT))
-
-	while master == {}:
-		data, address = s.recvfrom(65535)
-    	master[address] = data
-    	print data, address
-    	print master
-
-def get_local_ip():
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8', 80))
-        ip = s.getsockname()[0]
-    finally:
-        s.close()
-    return ip
-
-lo_addr = get_local_ip()
-
-av_ports = [9998, 9999]
-
-for i in range(len(av_ports)):
-   ports.append((lo_addr, av_ports[i]))
-
-s1.bind(ports[0])
-s2.bind(ports[1])
-str_ports = str(ports)
-
-def init():
-	print 'visual function initialized'
-	init_request = 'connect| visual|' + str_ports
-	s.sendto(init_request, ('192.168.1.235', 8014))
-
-def command():
-	while True:
-		str = raw_input()
-		if str == 'connect':
-			request = 'connect| visual|' + str_ports
-			s.sendto(request, ('192.168.1.235', 8014))
-			print 's'
-		elif str == 'disconnect':	
-			request = 'disconnect| visual|' + str_ports
-			s.sendto(request, ('192.168.1.235', 8014))
-		elif str == 'help':
-			print 'help'
-		else:
-			print 'enter "help" for more command'
 
 def reveice_play(s,sc):
 	data,addr = s.recvfrom(64000)
@@ -74,29 +33,49 @@ def reveice_play(s,sc):
 	cv2.imshow(sc, image)
 	cv2.waitKey(10)
 
+def reveice_proc(s,sc):
+	while(True):
+		data,addr = s.recvfrom(64000)
+		data = numpy.fromstring(data, dtype = 'uint8')
+		image = cv2.imdecode(data, 1)
+	    frame = cv2.resize(image, (320, 240))
+	    [xlist, ylist] = rtd.get_landmarks(frame,detector,predictor)
+	    vec_landmark = rtd.get_vectorized_landmark(frame,detector,predictor)*w1
+	    realtime_data = np.array([])
+	    if (xlist.size) and (vec_landmark.size):
+	        Norm_AU_feature = rtd.extract_AU(xlist,ylist)*w2
+	        vec_AU = np.concatenate((Norm_AU_feature,vec_landmark))
+	        vec_AU= ((vec_AU-np.min(vec_AU))/np.ptp(vec_AU))
+	        realtime_data = np.concatenate((realtime_data,vec_AU))
+	        clf = joblib.load("/home/"+user_name+"/Philos_R/Functions/Emotion/landmark_SVM.pkl") 
+	        Y = clf.predict([realtime_data])
+	        if Y == 0:
+	            print 'anger'
+	        if Y == 1:
+	            print 'disgust'
+	        if Y == 2:
+	            print 'fear'
+	        if Y == 3:
+	            print 'happiness'
+	        if Y == 4:
+	            print 'neutral'
+	        if Y == 5:
+	            print 'sadness'
+	        if Y == 6:
+	            print 'surprise'
+	    cv2.imshow(sc, image)
+	    if cv2.waitKey(1) & 0xFF == ord('q'):
+	        break
+	cap.release()
+	cv2.destroyAllWindows()
+
 def play1():
 	while True:
 		reveice_play(s1, "Taoge Niubi 1")
 	s1.close()
 
-def play2():
-	while True:
-		reveice_play(s2, "Taoge Niubi 2")
-	s2.close()
-
 def main():
-	init()
-	thread_c = threading.Thread(target = command)
-	thread_c.start()
-	thread_s1 = threading.Thread(target = play1);
-	thread_s1.start();
-	thread_s2 = threading.Thread(target = play2);
-	thread_s2.start();
-
-	thread_c.join()
-
-def test():
-	search_master()
+	reveice_proc()
 
 if __name__ == '__main__':
-	test()
+	main()
