@@ -2,12 +2,13 @@ from Emotion import detection
 import getpass
 import dlib
 import cv2
+import socket
 import numpy as np
 from sklearn.externals import joblib
 
 s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-s1.bind(('192.168.1.115', 9901))
+s1.bind(('192.168.1.71', 9901))
 
 
 emotions = ["anger",  "disgust" ,"fear","happiness", "neutral", "sadness", "surprise"] #Emotion list
@@ -38,34 +39,34 @@ def reveice_proc(s,sc):
 		data,addr = s.recvfrom(64000)
 		data = numpy.fromstring(data, dtype = 'uint8')
 		image = cv2.imdecode(data, 1)
-	    frame = cv2.resize(image, (320, 240))
-	    [xlist, ylist] = rtd.get_landmarks(frame,detector,predictor)
-	    vec_landmark = rtd.get_vectorized_landmark(frame,detector,predictor)*w1
-	    realtime_data = np.array([])
-	    if (xlist.size) and (vec_landmark.size):
-	        Norm_AU_feature = rtd.extract_AU(xlist,ylist)*w2
-	        vec_AU = np.concatenate((Norm_AU_feature,vec_landmark))
-	        vec_AU= ((vec_AU-np.min(vec_AU))/np.ptp(vec_AU))
-	        realtime_data = np.concatenate((realtime_data,vec_AU))
-	        clf = joblib.load("/home/"+user_name+"/Philos_R/Functions/Emotion/landmark_SVM.pkl") 
-	        Y = clf.predict([realtime_data])
-	        if Y == 0:
-	            print 'anger'
-	        if Y == 1:
-	            print 'disgust'
-	        if Y == 2:
-	            print 'fear'
-	        if Y == 3:
-	            print 'happiness'
-	        if Y == 4:
-	            print 'neutral'
-	        if Y == 5:
-	            print 'sadness'
-	        if Y == 6:
-	            print 'surprise'
-	    cv2.imshow(sc, image)
-	    if cv2.waitKey(1) & 0xFF == ord('q'):
-	        break
+		frame = cv2.resize(image, (320, 240))
+		[xlist, ylist] = rtd.get_landmarks(frame,detector,predictor)
+		vec_landmark = rtd.get_vectorized_landmark(frame,detector,predictor)*w1
+		realtime_data = np.array([])
+		if (xlist.size) and (vec_landmark.size):
+			Norm_AU_feature = rtd.extract_AU(xlist,ylist)*w2
+			vec_AU = np.concatenate((Norm_AU_feature,vec_landmark))
+			vec_AU= ((vec_AU-np.min(vec_AU))/np.ptp(vec_AU))
+			realtime_data = np.concatenate((realtime_data,vec_AU))
+			clf = joblib.load("/home/"+user_name+"/Philos_R/Functions/Emotion/landmark_SVM.pkl")
+			Y = clf.predict([realtime_data])
+			if Y == 0:
+				print 'anger'
+			if Y == 1:
+				print 'disgust'
+			if Y == 2:
+				print 'fear'
+			if Y == 3:
+				print 'happiness'
+			if Y == 4:
+				print 'neutral'
+			if Y == 5:
+				print 'sadness'
+			if Y == 6:
+				print 'surprise'
+			cv2.imshow(sc, image)
+		if cv2.waitKey(1) & 0xFF == ord('q'):
+			break
 	cap.release()
 	cv2.destroyAllWindows()
 
@@ -75,7 +76,7 @@ def play1():
 	s1.close()
 
 def main():
-	reveice_proc()
+	reveice_proc(s1, "xiangyi meimie da")
 
 if __name__ == '__main__':
 	main()
