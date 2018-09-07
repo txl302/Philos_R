@@ -61,16 +61,15 @@ def reveice_proc(s,sc,se, port):
 	cap.release()
 	cv2.destroyAllWindows()
 
+def ev(n):
+
+	for i in range(n):
+		name = "robot" + str(n)
+		thread[n] = threading.Thread(target = reveice_proc, args = (s1, name, se1, 999+n))
+		thread[n].start()
+
 def main():
-
-	thread1 = threading.Thread(target = reveice_proc, args = (s1, "robot1", se1, 9991))
-	thread1.start()
-
-	thread2 = threading.Thread(target = reveice_proc, args = (s2, "robot2", se2, 9992))
-	thread2.start()
-
-	thread3 = threading.Thread(target = reveice_proc, args = (s3, "robot3", se3, 9993))
-	thread3.start()
+	ev(1)
 
 if __name__ == '__main__':
 	main()
