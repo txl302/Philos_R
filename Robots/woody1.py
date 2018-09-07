@@ -154,9 +154,13 @@ def send_to_emotion():
 		se.sendto(imgencode, ("192.168.1.71", 9901))
 	se.close()
 
+def receive_move(s):
+	data, addr = s.recvfrom(64000)
+
+
 def main():
     #test()
-	#init()
+	init()
 
 	#request()
 	#run()
