@@ -146,10 +146,8 @@ def test():
         woody_action.move_to([3,4,5], pose)
 
 def send_to_emotion():
-        #print imgencode
-        global imgencode
+	global imgencode
 	while True:
-                print 111
 		imgencode = woody_vision.cam()
 		se.sendto(imgencode, ("192.168.1.71", 9901))
 	se.close()

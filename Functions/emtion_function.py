@@ -3,6 +3,7 @@ import getpass
 import dlib
 import cv2
 import socket
+import threading
 import numpy as np
 from sklearn.externals import joblib
 
@@ -16,8 +17,8 @@ s3 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s3.bind(('192.168.1.71', 9903))
 
 se1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-se1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-se1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+se2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+se3 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 emotions = ["anger",  "disgust" ,"fear","happiness", "neutral", "sadness", "surprise"] #Emotion list
 user_name = getpass.getuser()
@@ -44,6 +45,9 @@ def reveice_proc(s,sc,se, port):
 			realtime_data = np.concatenate((realtime_data,vec_AU))
 			clf = joblib.load("/home/"+user_name+"/Philos_R/Functions/Emotion/landmark_SVM.pkl")
 			Y = clf.predict([realtime_data])
+
+			se.sendto(Y, ('192.168.1.45', port))
+
 			if Y == 0:
 				print 'anger'
 			if Y == 1:
@@ -58,9 +62,9 @@ def reveice_proc(s,sc,se, port):
 				print 'sadness'
 			if Y == 6:
 				print 'surprise'
-			cv2.imshow(sc, image)
+		cv2.imshow(sc, image)
 
-			se.sendto(Y, ('192.168.1.45', port))
+		
 
 
 		if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -70,14 +74,14 @@ def reveice_proc(s,sc,se, port):
 
 def main():
 
-	thread_c = threading.Thread(reveice_proc, (s1, "robot1", se1, 9991))
-	thread_c.start()
+	thread1 = threading.Thread(target = reveice_proc, args = (s1, "robot1", se1, 9991))
+	thread1.start()
 
-	thread_c = threading.Thread(reveice_proc, (s2, "robot2", se2, 9992))
-	thread_c.start()
+	thread2 = threading.Thread(target = reveice_proc, args = (s2, "robot2", se2, 9992))
+	thread2.start()
 
-	thread_c = threading.Thread(reveice_proc, (s3, "robot3", se3, 9993))
-	thread_c.start()
+	thread3 = threading.Thread(target = reveice_proc, args = (s3, "robot3", se3, 9993))
+	thread3.start()
 
 if __name__ == '__main__':
 	main()
