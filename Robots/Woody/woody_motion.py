@@ -7,9 +7,7 @@ def move_to_left(dx, dy, dz):
    L3 = 40;
    L4 = 210;
 
-
    theta1 = math.atan(dz/dx)
-
 
    if dy>0:
       dxx = dx/math.cos(theta1);

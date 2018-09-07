@@ -18,7 +18,9 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 s_a = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s_v = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
 se = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sm = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -154,6 +156,21 @@ def send_to_emotion():
 
 def receive_move(s):
 	data, addr = s.recvfrom(64000)
+	Y = data
+	if Y == 0:
+		print 'anger'
+	if Y == 1:
+		print 'disgust'
+	if Y == 2:
+				print 'fear'
+			if Y == 3:
+				print 'happiness'
+			if Y == 4:
+				print 'neutral'
+			if Y == 5:
+				print 'sadness'
+			if Y == 6:
+				print 'surprise'
 
 
 def main():
@@ -163,7 +180,13 @@ def main():
 	#request()
 	#run()
 
-	send_to_emotion()
+	#send_to_emotion()
+
+	thread_e = threading.Thread(target = send_to_emotion)
+	thread_e.start()
+
+	thread_m = threading.Thread(target = receive_move, args = (s1))
+	thread_m.start()
 
 	
 if __name__ == '__main__':
