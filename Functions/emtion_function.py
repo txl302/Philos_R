@@ -29,8 +29,17 @@ w1=0.75
 w2=1-w1
 rtd = detection.real_time_detection()
 
+
+
 def reveice_proc(s,sc,se, port):
+	time_tmp = 0
 	while(True):
+
+		print (time.time() - time_tmp)
+
+
+		time_tmp = time.time()
+
 		data,addr = s.recvfrom(64000)
 		data = np.fromstring(data, dtype = 'uint8')
 		image = cv2.imdecode(data, 1)
@@ -63,9 +72,6 @@ def reveice_proc(s,sc,se, port):
 			if Y == 6:
 				print 'surprise'
 		cv2.imshow(sc, image)
-
-		
-
 
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
