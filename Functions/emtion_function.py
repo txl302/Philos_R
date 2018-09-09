@@ -8,13 +8,13 @@ import numpy as np
 from sklearn.externals import joblib
 
 s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s1.bind(('192.168.1.71', 9901))
+s1.bind(('192.168.1.109', 9901))
 
 s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s2.bind(('192.168.1.71', 9902))
+s2.bind(('192.168.1.109', 9902))
 
 s3 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s3.bind(('192.168.1.71', 9903))
+s3.bind(('192.168.1.109', 9903))
 
 se1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 se2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
