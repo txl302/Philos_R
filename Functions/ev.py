@@ -8,13 +8,13 @@ import numpy as np
 from sklearn.externals import joblib
 
 s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s1.bind(('192.168.1.71', 9901))
+s1.bind(('192.168.1.109', 9901))
 
 s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s2.bind(('192.168.1.71', 9902))
+s2.bind(('192.168.1.109', 9902))
 
 s3 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s3.bind(('192.168.1.71', 9903))
+s3.bind(('192.168.1.109', 9903))
 
 se1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 se2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -49,7 +49,7 @@ def reveice_proc(s,sc,se, port):
 			vec_AU = np.concatenate((Norm_AU_feature,vec_landmark))
 			vec_AU= ((vec_AU-np.min(vec_AU))/np.ptp(vec_AU))
 			realtime_data = np.concatenate((realtime_data,vec_AU))
-			clf = joblib.load("/home/"+user_name+"/Philos_R/Functions/Emotion/best_landmark_SVM.pkl")
+			clf = joblib.load("/home/"+user_name+"/Philos_R/Functions/Emotion/320_240_landmark_SVM.pkl")
 			Y = clf.predict([realtime_data])
 
 			se.sendto(Y, ('192.168.1.45', port))

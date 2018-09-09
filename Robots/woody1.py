@@ -151,7 +151,7 @@ def send_to_emotion():
 	global imgencode
 	while True:
 		imgencode = woody_vision.cam()
-		se.sendto(imgencode, ("192.168.1.71", 9901))
+		se.sendto(imgencode, ("192.168.1.109", 9901))
 	se.close()
 
 def receive_move(s):
