@@ -44,8 +44,8 @@ def init_check():
     time.sleep(1.5)
     dxl_io.set_goal_position(dict(zip(ids, starting_pose)))
     
-def move_to(m_id, pose, speed):
-    dxl_io.set_moving_speed(dict(zip(m_id, itertools.repeat(speed))))
+def move_to(m_id, pose):
+    #dxl_io.set_moving_speed(dict(zip(m_id, itertools.repeat(speed))))
     dxl_io.set_goal_position(dict(zip(m_id, pose)))
 
 def main():

@@ -5,11 +5,12 @@ import threading
 import os
 import time
 import getpass
+from multiprocessing import Process
 
 from Woody import woody_vision
-#from Woody import woody_action
-#from Woody import woody_motion
-#from Woody import woody_embedded
+from Woody import woody_action
+from Woody import woody_motion
+from Woody import woody_embedded
 
 rob_name = 'woody1'
 user_name = getpass.getuser()
@@ -40,7 +41,7 @@ av_ports = [9991, 9999]
 for i in range(len(av_ports)):
    ports.append((lo_addr, av_ports[i]))
 
-s1.bind(ports[0])
+s1.bind(("192.168.1.94", 8014))
 s2.bind(ports[1])
 
 str_ports = str(ports)
@@ -154,9 +155,13 @@ def send_to_emotion():
 		se.sendto(imgencode, ("192.168.1.109", 9901))
 	se.close()
 
-def receive_move(s):
-	data, addr = s.recvfrom(64000)
-	Y = data
+def receive_move():
+    global s1
+    while True:
+        print 1
+	data, addr = s1.recvfrom(64000)
+	print data
+	Y = int(data[2])
 	if Y == 0:
 		print 'anger'
 		woody_embedded.anger_disgust()
@@ -165,19 +170,19 @@ def receive_move(s):
 		woody_embedded.anger_disgust()
 	if Y == 2:
 		print 'fear'
-		woody.embedded.fear_surprise()
+		woody_embedded.fear_surprise()
 	if Y == 3:
 		print 'happiness'
-		woody.embedded.happiness_neutral()
+		woody_embedded.happiness_neutral()
 	if Y == 4:
 		print 'neutral'
-		woody.embedded.happiness_neutral()
+		woody_embedded.happiness_neutral()
 	if Y == 5:
 		print 'sadness'
-		woody.embedded.sadness()
+		woody_embedded.sadness()
 	if Y == 6:
 		print 'surprise'
-		woody.embedded.fear_surprise()
+		woody_embedded.fear_surprise()
 
 
 def main():
@@ -189,11 +194,11 @@ def main():
 
 	#send_to_emotion()
 
-	thread_e = threading.Thread(target = send_to_emotion)
-	thread_e.start()
+	p_e = Process(target = send_to_emotion)
+	p_e.start()
 
-	thread_m = threading.Thread(target = receive_move, args = (s1))
-	thread_m.start()
+        p_m = Process(target = receive_move)
+	p_m.start()
 
 	
 if __name__ == '__main__':
