@@ -36,7 +36,7 @@ def get_host_ip():
     return ip
     
 lo_addr = get_host_ip()
-av_ports = [9998, 9999]
+av_ports = [9991, 9999]
 for i in range(len(av_ports)):
    ports.append((lo_addr, av_ports[i]))
 
@@ -159,23 +159,30 @@ def receive_move(s):
 	Y = data
 	if Y == 0:
 		print 'anger'
+		woody_embedded.anger_disgust()
 	if Y == 1:
 		print 'disgust'
+		woody_embedded.anger_disgust()
 	if Y == 2:
-				print 'fear'
-			if Y == 3:
-				print 'happiness'
-			if Y == 4:
-				print 'neutral'
-			if Y == 5:
-				print 'sadness'
-			if Y == 6:
-				print 'surprise'
+		print 'fear'
+		woody.embedded.fear_surprise()
+	if Y == 3:
+		print 'happiness'
+		woody.embedded.happiness_neutral()
+	if Y == 4:
+		print 'neutral'
+		woody.embedded.happiness_neutral()
+	if Y == 5:
+		print 'sadness'
+		woody.embedded.sadness()
+	if Y == 6:
+		print 'surprise'
+		woody.embedded.fear_surprise()
 
 
 def main():
     #test()
-	init()
+	#init()
 
 	#request()
 	#run()

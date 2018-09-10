@@ -35,11 +35,6 @@ def reveice_proc(s,sc,se, port):
 	time_tmp = 0
 	while(True):
 
-		print (time.time() - time_tmp)
-
-
-		time_tmp = time.time()
-
 		data,addr = s.recvfrom(64000)
 		data = np.fromstring(data, dtype = 'uint8')
 		image = cv2.imdecode(data, 1)

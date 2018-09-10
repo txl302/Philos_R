@@ -2,8 +2,11 @@ from Emotion import detection
 import getpass
 import dlib
 import cv2
+import time
 import socket
 import threading
+
+from multiprocessing import Process
 import numpy as np
 from sklearn.externals import joblib
 
@@ -29,11 +32,14 @@ w1=0.75
 w2=1-w1
 rtd = detection.real_time_detection()
 
+#class myThread(threading.Thread):
+	#def __init__(self, threadID, name)
 
 
 def reveice_proc(s,sc,se, port):
 	time_tmp = 0
 	while(True):
+		#print 's'
 		print (time.time() - time_tmp)
 		time_tmp = time.time()
 
@@ -52,24 +58,48 @@ def reveice_proc(s,sc,se, port):
 			clf = joblib.load("/home/"+user_name+"/Philos_R/Functions/Emotion/320_240_landmark_SVM.pkl")
 			Y = clf.predict([realtime_data])
 
-			se.sendto(Y, ('192.168.1.45', port))
+			#se.sendto(Y, ('192.168.1.45', port))
 
-		cv2.imshow(sc, image)
+		#cv2.imshow(sc, image)
 
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 	cap.release()
 	cv2.destroyAllWindows()
+def test(fa):
+	while True:
+		print fa
 
 def ev(n):
 
+	thread = []
+
 	for i in range(n):
-		name = "robot" + str(n)
-		thread[n] = threading.Thread(target = reveice_proc, args = (s1, name, se1, 999+n))
-		thread[n].start()
+		name = "robot" + str(i)
+		thread.append(threading.Thread(target = reveice_proc, args = (s1, name, se1, 999+i)))
+		#thread.append(threading.Thread(target = test, args = (999+i)))
+		#print i
+
+	for i in range(n):
+		thread[i].start()
+		#print i,i
+
+def evp(n):
+
+	p = []
+
+	for i in range(n):
+		name = "robot" + str(i)
+		p.append(Process(target = reveice_proc, args = (s1, name, se1, 999+i)))
+		#thread.append(threading.Thread(target = test, args = (999+i)))
+		#print i
+
+	for i in range(n):
+		p[i].start()
+		#print i,i
 
 def main():
-	ev(1)
+	evp(10)
 
 if __name__ == '__main__':
 	main()
