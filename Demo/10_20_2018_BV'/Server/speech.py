@@ -26,25 +26,25 @@ try:
 
                 print(value)
 
-                if value == "hi":
+                if value.find("hi") >= 0:
                     os.system("mpg321 hello.mp3")
 
-                elif value == "hello":
+                elif value.find("hello") >= 0:
                     os.system("mpg321 hi.mp3")
 
-                elif value == "what's your name":
+                elif value.find("name") >= 0:
                     os.system("mpg321 myname.mp3")
 
-                elif value == "how are you":
+                elif value.find("how are you") >= 0:
                     os.system("mpg321 imgoodhowru.mp3")
 
-                elif value == "how is the weather today":
+                elif value.find("whether") >= 0:
                     os.system("mpg321 idkino.mp3")
 
-                elif value == "good afternoon":
+                elif value.find("good afternoon") >= 0:
                     os.system("mpg321 goodafternoon.mp3")
 
-                elif value == "what time is it":
+                elif value.find("time") >= 0:
                     localtime = time.asctime(time.localtime(time.time()))
                     ttss = "It's" + str(localtime)
                     file_name = 'time.mp3'
@@ -52,7 +52,7 @@ try:
                     tts.save(file_name)
                     os.system("mpg321 " + file_name)
 
-                elif value == "how old are you":
+                elif value.find("old") >= 0:
                     os.system("mpg321 justborn.mp3")
 
                 else:

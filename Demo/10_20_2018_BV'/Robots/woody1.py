@@ -197,7 +197,7 @@ def main():
 	p_e = Process(target = send_to_emotion)
 	p_e.start()
 
-        p_m = Process(target = receive_move)
+    p_m = Process(target = receive_move)
 	p_m.start()
 
 	
