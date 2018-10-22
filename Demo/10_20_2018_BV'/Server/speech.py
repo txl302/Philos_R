@@ -38,7 +38,7 @@ try:
                 elif value.find("how are you") >= 0:
                     os.system("mpg321 imgoodhowru.mp3")
 
-                elif value.find("whether") >= 0:
+                elif value.find("weather") >= 0:
                     os.system("mpg321 idkino.mp3")
 
                 elif value.find("good afternoon") >= 0:
