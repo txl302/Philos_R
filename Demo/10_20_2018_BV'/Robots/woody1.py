@@ -4,202 +4,301 @@ import numpy
 import threading
 import os
 import time
-import getpass
-from multiprocessing import Process
 
-from Woody import woody_vision
 from Woody import woody_action
 from Woody import woody_motion
-from Woody import woody_embedded
-
-rob_name = 'woody1'
-user_name = getpass.getuser()
-
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-s_a = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s_v = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-se = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sm = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-s1 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-ports = []
-def get_host_ip():
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8', 80))
-        ip = s.getsockname()[0]
-    finally:
-        s.close()
-    return ip
-    
-lo_addr = get_host_ip()
-av_ports = [9991, 9999]
-for i in range(len(av_ports)):
-   ports.append((lo_addr, av_ports[i]))
-
-s1.bind(("192.168.1.94", 8014))
-s2.bind(ports[1])
-
-str_ports = str(ports)
-
-imgencode = []
-
-function_server = {}
-
-visual_flag = 0
-motion_flag = 0
-audio_flag = 0
-
-def init_check():
-
-	global visual_flag
-	global motion_flag
-	global audio_flag
-
-	print 'self checking......'
-
-	try:
-		imgencode = woody_vision.cam()
-		print "camera ready"
-	except:
-		print "camera offline"
-
-	woody_embedded.random_look()
-
-	try:
-		os.system("mplayer /home/"+user_name+"/Philos_R/Robots/Woody/speaker_checking.wav")
-	except:
-		pass
-	time.sleep(2)
-
-	try:
-		from Woody import woody_action
-		print "motion module detected"
-		try:
-			woody_action.init_check()
-			print "motion unit ready"
-		except:
-			print "motion unit error"
-	except:
-		print "motion module offline"
-	time.sleep(2)
 
 
-	time.sleep(2)
+import speech_recognition as sr
+from gtts import gTTS
 
-def init():
-	print 'robot %s initialing......' %rob_name
+import numpy as np
 
-	init_check()
+import itertools
 
-	init_request = 'connect| ' + rob_name + '|' + str_ports
-	s.sendto(init_request, ('192.168.1.235', 8013))
-	print 'robot %s initialized' %rob_name
+import pypot.dynamixel
 
-	os.system("mplayer /home/"+user_name+"/Philos_R/Robots/Woody/check_successful.wav")
+import threading
+from random import randint
 
-def request():
-	global function_server
-	print 'sending request to server'
-	f_request = ['visual', 'audio', 'motion']
-	send_request = 'connect| woody1|' + str_ports
-	s.sendto(send_request, ('192.168.1.235', 8013))
-	feedback = s.recvfrom(1024)
-	for i in range(len(f_request)):
-		function_server[f_request[i]] = feedback[i]
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_alt.xml')
+rectangleColor = (0,165,255)  
 
-def cam():
-	while True:
-		global imgencode
-		imgencode = woody_vision.cam()
+cap = cv2.VideoCapture(0)
+width = 320
+height = 240
+cap.set(3,width);
+cap.set(4,height);
 
-def v_send():
-	while True:
-		s_v.sendto(imgencode, function_server['visual'])
-	s_v.close()
+
+
+move1 = 0.0
+move2 = 0.0
+
+def camera():
+    global move1
+    global move2
+    ret, img = cap.read()
+    #print img
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    maxArea = 0  
+    x = 0  
+    y = 0  
+    w = 0  
+    h = 0
+
+    for (_x,_y,_w,_h) in faces:
+        if _w*_h > maxArea:
+            x = _x
+            y = _y
+            w = _w
+            h = _h
+            maxArea = w*h
+    if maxArea > 0:
+        cv2.rectangle(img,(x,y),(x+w,y+h),rectangleColor,4)
+        a = x+w/2
+        b = y+h/2
+
+        if a>5 and b>5:
+            move1 = -85*(a-width/2)/width
+            move2 = 14.5*(b-height/2)/height
+            #print move1, move2
+            return (move1, move2)
+            
+        #roi_gray = gray[y:y+h, x:x+w]
+        #roi_color = img[y:y+h, x:x+w]
+        #cv2.putText(img, "x: {}, y: {}".format(a, b), (10, img.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
+        #1, (0, 0, 255), 5)
+ 
+    #cv2.imshow('img',img)
+
+def vision():
+
+        while True:
+                if (flag == 0):
+                        camera()
+                        k = cv2.waitKey(20) & 0xff
+                        if k == 27:
+                                break
+                        
+                #time.sleep(0.3)
+
+                
+
+
+def neck_move():
+    global move1
+    global move2
+    print flag
+    while True:
+                #print flag
+                if (flag == 0):
+                    move_1 = move1
+                    move_2 = move2
+                    #print move_1, move_2
+                    #p_1 = dxl_io.get_present_position((1,))
+                    #p_2 = dxl_io.get_present_position((2,))
+                    p_1 = woody_action.get_present_position((1,))
+                    p_2 = woody_action.get_present_position((2,))
+                    p_1 = p_1[0]
+                    p_2 = p_2[0]
+                    if (-90<p_1<-5 and -10<p_2<5):
+                            c_move_1 = p_1+0.4 *move_1
+                            c_move_2 = p_2+0.4*move_2
+                            if (-90<c_move_1<-5 and -10<c_move_2<5):
+                                    woody_action.move_to([1,2], [c_move_1, c_move_2])
+                time.sleep(0.3)
+
+
+
+r = sr.Recognizer()
+m = sr.Microphone()
+
+init = {}
+
+flag = 0
+value = 0
+
+
+print("A moment of silence, please...")
+with m as source: r.adjust_for_ambient_noise(source)
+print("Set minimum energy threshold to {}".format(r.energy_threshold))
+print("Hello!")
+
+
+
+
+def fake():
+    global flag
+    global value
+    cumu = 0
+    s = ['hi', 'hello', 'are you', 'afternoon', 'old', 'weather', 'hug', 'dance', 'music']
+    i = 0
+    while True:
+        print flag, 'fake'
+
+        if (flag == 0):
+            cumu = cumu + 1
+            print cumu
+            if cumu == 40:
+                    value = s[i]
+                    print value
+                    flag = 1
+                    cumu = 0
+                    if i<=7:
+                        i = i + 1
+                    else:
+                        i = 0
+        time.sleep(0.3)
+
+
+
+def voice_recog():
+        global flag
+        global value
+
+        while True:
+                #print flag
+                if (flag == 0):
+                            
+                        with m as source: audio = r.listen(source)
+                        print("Got it! Now to recognize it...")
+                        try:
+                            value = r.recognize_google(audio)
+
+                            if str is bytes:
+
+                                print(value)
+
+                                flag = 1
+                                #print flag
+
+                            else:
+                                print("You said {}".format(value))
+
+                        except sr.UnknownValueError:
+                            print("Oops! Didn't catch that")
+
+                            os.system("mpg321 idu.mp3")
+
+                time.sleep(30)
+                        
 
 def audio():
-	pass
+        global flag
+        while True:
+                
+                if (flag == 1):
+                        print value, bool(value)
+                        if value:
+                                print 'ok'
 
-def move():
-	woody_action.move_to()
+                                if value.find("hi") >= 0:
+                                    os.system("mplayer voice/intro.mp3")
+                                    flag = 0
 
-def self_check():
-	pass
+                                elif value.find("hello") >= 0:
+                                    os.system("mplayer voice/hello.mp3")
+                                    flag = 0
 
+                                elif value.find("old") >= 0:
+                                    os.system("mplayer voice/how\ old\ are\ you.mp3")
+                                    flag = 0  
+
+                                elif value.find("are you") >= 0:
+                                    os.system("mplayer voice/how\ are\ you.mp3")
+                                    flag = 0
+
+                                elif value.find("afternoon") >= 0:
+                                    os.system("mplayer voice/good\ afternnon.mp3")
+                                    flag = 0
+
+                                elif value.find("hug") >= 0:
+                                    os.system("mplayer voice/hug.mp3")
+                                    flag = 0
+
+                                elif value.find("sad") >= 0:
+                                    os.system("mplayer voice/sad.mp3")
+                                    flag = 0
+                                    
+                                elif value.find("dance") >= 0:
+                                    os.system("mplayer voice/dance.m4a")
+                                    flag = 0
+
+                                elif value.find("weather") >= 0:
+                                    os.system("mplayer voice/weather.mp3")
+                                    flag = 0
+
+                                elif value.find("music") >= 0:
+                                    os.system("mplayer voice/mozart.mp3")
+                                    flag = 0
+
+                                else:
+                                    os.system("mplayer voice/sorry.mp3")
+                                    flag = 0
+                time.sleep(0.3)
+        
+
+def motion():
+        global flag
+        while True:
+                if (flag == 1):
+                        print value, bool(value)
+                        if value:
+                                print 'ok'
+
+                                if value.find("hi") >= 0:
+                                    woody_action.hello()
+
+                                elif value.find("hello") >= 0:
+                                    woody_action.hello()
+
+                                elif value.find("afternoon") >= 0:
+                                    woody_action.thank_you()
+
+                                elif value.find("hug") >= 0:
+                                    woody_action.hugging()
+
+                                elif value.find("sad") >= 0:
+                                    woody_action.crying()
+
+                                elif value.find("dance") >= 0:
+                                    woody_action.dance2()
+
+                                elif value.find("music") >= 0:
+                                    woody_action.dance2()
+                                    woody_action.dance3()
+                                    woody_action.dance2()
+
+                time.sleep(0.3)
+                
 def run():
-	thread_c = threading.Thread(target = cam);
-	thread_c.start();
+        thread_neck = threading.Thread(target = neck_move)
+        thread_v = threading.Thread(target = vision)
+    
+        
 
-	thread_v_s = threading.Thread(target = v_send);
-	thread_v_s.start();
+        thread_r = threading.Thread(target = voice_recog)
+        
+        thread_a = threading.Thread(target = audio)
 
-	thread_a = threading.Thread(target = audio)
-	thread_a.start()
+        thread_m = threading.Thread(target = motion)
 
-	thread_m = threading.Thread(target = move)
-	thread_m.start()
+        thread_f = threading.Thread(target = fake)
 
-def test():
-        pose = woody_motion.move_to_left(50, 50, 50)
-        woody_action.move_to([3,4,5], pose)
+        thread_v.start()
+        thread_neck.start()
 
-def send_to_emotion():
-	global imgencode
-	while True:
-		imgencode = woody_vision.cam()
-		se.sendto(imgencode, ("192.168.1.109", 9901))
-	se.close()
+        thread_f.start()
 
-def receive_move():
-    global s1
-    while True:
-        print 1
-	data, addr = s1.recvfrom(64000)
-	print data
-	Y = int(data[2])
-	if Y == 0:
-		print 'anger'
-		woody_embedded.anger_disgust()
-	if Y == 1:
-		print 'disgust'
-		woody_embedded.anger_disgust()
-	if Y == 2:
-		print 'fear'
-		woody_embedded.fear_surprise()
-	if Y == 3:
-		print 'happiness'
-		woody_embedded.happiness_neutral()
-	if Y == 4:
-		print 'neutral'
-		woody_embedded.happiness_neutral()
-	if Y == 5:
-		print 'sadness'
-		woody_embedded.sadness()
-	if Y == 6:
-		print 'surprise'
-		woody_embedded.fear_surprise()
+        thread_r.start()
+        thread_a.start()
+        thread_m.start()
 
-
-def main():
-    #test()
-	#init()
-
-	#request()
-	#run()
-
-	#send_to_emotion()
-
-	p_e = Process(target = send_to_emotion)
-	p_e.start()
-
-    p_m = Process(target = receive_move)
-	p_m.start()
 
 	
 if __name__ == '__main__':
-	main()
+	run()
+        #vision()
