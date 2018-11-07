@@ -1,28 +1,17 @@
 import cv2
 import socket
-import numpy
 import threading
 import os
 import time
-
-from Woody import woody_action
-from Woody import woody_motion
-
-
-import speech_recognition as sr
-from gtts import gTTS
-
-import numpy as np
-
 import itertools
 
-import pypot.dynamixel
-
-import threading
+#import speech_recognition as sr
+#from gtts import gTTS
 from random import randint
+#import pypot.dynamixel
 
-face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_alt.xml')
-rectangleColor = (0,165,255)  
+#from Woody import woody_action
+#from Woody import woody_motion
 
 cap = cv2.VideoCapture(0)
 width = 320
@@ -30,89 +19,62 @@ height = 240
 cap.set(3,width);
 cap.set(4,height);
 
-
-
 move1 = 0.0
 move2 = 0.0
 
-def camera():
-    global move1
-    global move2
+
+s_vision = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#s_nm = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+#s_nm.bind(("192.168.1.143", 9902))
+
+def camera_send():
+
     ret, img = cap.read()
-    #print img
+    result, imgencode = cv2.imencode('.jpg',img) 
 
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-    maxArea = 0  
-    x = 0  
-    y = 0  
-    w = 0  
-    h = 0
+    s_vision.sendto(imgencode, ("192.168.1.220", 9901))
 
-    for (_x,_y,_w,_h) in faces:
-        if _w*_h > maxArea:
-            x = _x
-            y = _y
-            w = _w
-            h = _h
-            maxArea = w*h
-    if maxArea > 0:
-        cv2.rectangle(img,(x,y),(x+w,y+h),rectangleColor,4)
-        a = x+w/2
-        b = y+h/2
-
-        if a>5 and b>5:
-            move1 = -85*(a-width/2)/width
-            move2 = 14.5*(b-height/2)/height
-            #print move1, move2
-            return (move1, move2)
-            
-        #roi_gray = gray[y:y+h, x:x+w]
-        #roi_color = img[y:y+h, x:x+w]
-        #cv2.putText(img, "x: {}, y: {}".format(a, b), (10, img.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
-        #1, (0, 0, 255), 5)
- 
-    #cv2.imshow('img',img)
+    cv2.imshow('img',img)
 
 def vision():
-
-        while True:
-                if (flag == 0):
-                        camera()
-                        k = cv2.waitKey(20) & 0xff
-                        if k == 27:
-                                break
-                        
-                #time.sleep(0.3)
-
-                
-
+    while True:
+        if (flag == 0):
+            camera_send()
+            k = cv2.waitKey(20) & 0xff
+            if k == 27:
+                break
 
 def neck_move():
-    global move1
-    global move2
     print flag
+
+
     while True:
-                #print flag
-                if (flag == 0):
-                    move_1 = move1
-                    move_2 = move2
-                    #print move_1, move_2
+        if (flag == 0):
 
-                    p_1 = woody_action.get_present_position((1,))
-                    p_2 = woody_action.get_present_position((2,))
-                    p_1 = p_1[0]
-                    p_2 = p_2[0]
-                    if (-90<p_1<-5 and -10<p_2<5):
-                            c_move_1 = p_1+0.4 *move_1
-                            c_move_2 = p_2+0.4*move_2
-                            if (-90<c_move_1<-5 and -10<c_move_2<5):
-                                    woody_action.move_to([1,2], [c_move_1, c_move_2])
-                time.sleep(0.3)
+            data,addr = s.recvfrom(64000)
+
+            a = data.split()
+
+            move_1 = double(a[0])
+            move_2 = double(a[1])
 
 
-r = sr.Recognizer()
-m = sr.Microphone()
+
+            p_1 = woody_action.get_present_position((1,))
+            p_2 = woody_action.get_present_position((2,))
+            p_1 = p_1[0]
+            p_2 = p_2[0]
+            if (-90<p_1<-5 and -10<p_2<5):
+                c_move_1 = p_1+0.4 *move_1
+                c_move_2 = p_2+0.4*move_2
+                if (-90<c_move_1<-5 and -10<c_move_2<5):
+                    woody_action.move_to([1,2], [c_move_1, c_move_2])
+        time.sleep(0.3)
+
+
+#r = sr.Recognizer()
+#m = sr.Microphone()
 
 init = {}
 
@@ -120,42 +82,32 @@ flag = 0
 value = 0
 
 
-print("A moment of silence, please...")
-with m as source: r.adjust_for_ambient_noise(source)
-print("Set minimum energy threshold to {}".format(r.energy_threshold))
-print("Hello!")
+# print("A moment of silence, please...")
+# with m as source: r.adjust_for_ambient_noise(source)
+# print("Set minimum energy threshold to {}".format(r.energy_threshold))
+# print("Hello!")
 
 
 def voice_recog():
-        global flag
-        global value
+    global flag
+    global value
+    while True:
+        if (flag == 0):
+            with m as source: audio = r.listen(source)
+            print("Got it! Now to recognize it...")
+            try:
+                value = r.recognize_google(audio)
+                if str is bytes:
+                    print(value)
+                    flag = 1
+                else:
+                    print("You said {}".format(value))
 
-        while True:
-                #print flag
-                if (flag == 0):
-                            
-                        with m as source: audio = r.listen(source)
-                        print("Got it! Now to recognize it...")
-                        try:
-                            value = r.recognize_google(audio)
-
-                            if str is bytes:
-
-                                print(value)
-
-                                flag = 1
-                                #print flag
-
-                            else:
-                                print("You said {}".format(value))
-
-                        except sr.UnknownValueError:
-                            print("Oops! Didn't catch that")
-
-                            os.system("mpg321 idu.mp3")
-
-                time.sleep(30)
-                        
+            except sr.UnknownValueError:
+                print("Oops! Didn't catch that")
+                os.system("mpg321 idu.mp3")
+        time.sleep(30)
+                
 
 def audio():
         global flag
@@ -249,27 +201,21 @@ def run():
         thread_neck = threading.Thread(target = neck_move)
         thread_v = threading.Thread(target = vision)
     
-        
-
         thread_r = threading.Thread(target = voice_recog)
         
         thread_a = threading.Thread(target = audio)
 
         thread_m = threading.Thread(target = motion)
 
-        thread_f = threading.Thread(target = fake)
-
         thread_v.start()
-        thread_neck.start()
+        #thread_neck.start()
 
-        thread_f.start()
-
-        thread_r.start()
-        thread_a.start()
-        thread_m.start()
+        #thread_r.start()
+        #thread_a.start()
+        #thread_m.start()
 
 
 	
 if __name__ == '__main__':
-	run()
-        #vision()
+	#run()
+    vision()
