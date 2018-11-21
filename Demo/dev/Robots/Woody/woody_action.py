@@ -5,6 +5,8 @@ import pypot.dynamixel
 import math
 import time
 
+from math import *
+
 ports = pypot.dynamixel.get_available_ports()
 print('available ports:', ports)  
 
@@ -34,20 +36,29 @@ def get_present_position(m_id):
     p = dxl_io.get_present_position(m_id)
     return p
 
-def speed_position():
-	speed = 60*math.cos(time.time())
-	pose = 60*math.sin(time.time())
+def Guss(mu, sigma, x):
+	f = 1/(sqrt(2*pi)*sigma)*pow(e, (-pow((x - mu), 2)/2))
+	return f
 
-	return [speed, pose]
+def run(m_id, current_pos, des_pos, time_inv):
+	current_time = time.time()
+	des_time  = current_time + time_inv
+	n = len(m_id)
+	while True:
+		if time.time() <= des_time:
+			for i in range(n):
+				speed = (des_pos[i] - current_pos[i])*Guss(current_time, 1, time.time())
+			move_to(m_id, des_pos, speed)
 
-def run():
-	result = speed_postion()
-	speed = result[0]
-	position = result[1]
+pos1 = [1.32, -1.83]
+pos2 = [-86.07, 87.54]
 
-	move_to(8, speed, postion)
+ids = [3, 8]
 
-	time.sleep(1)
 
 if __name__ == '__main__':
-	run()
+	while True:
+		run(ids, pos1, pos2, 3)
+		time.sleep(3)
+		run(ids, pos2, pos1, 3)
+		time.sleep(3)
