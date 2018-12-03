@@ -5,6 +5,9 @@ import numpy
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+s_t = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s_t.bind(("192.168.1.130", 9901))
+
 s.bind(("192.168.1.220", 9901))
 
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_alt.xml')

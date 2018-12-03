@@ -1,48 +1,46 @@
 import itertools
 import numpy
-
-
 import math
 import time
 
 from math import *
 
-# import pypot.dynamixel
+import pypot.dynamixel
 
-# ports = pypot.dynamixel.get_available_ports()
-# print('available ports:', ports)  
+ports = pypot.dynamixel.get_available_ports()
+print('available ports:', ports)  
 
-# if not ports:
-#     raise IOError('No port available.') 
+if not ports:
+    raise IOError('No port available.') 
 
-# port = ports[0]
-# print('Using the first on the list', port)
+port = ports[0]
+print('Using the first on the list', port)
 
-# dxl_io = pypot.dynamixel.DxlIO(port)
-# print('Connected!')
+dxl_io = pypot.dynamixel.DxlIO(port)
+print('Connected!')
 
-# found_ids = dxl_io.scan(range(13))
-# print('Found ids:', found_ids)
+found_ids = dxl_io.scan(range(13))
+print('Found ids:', found_ids)
 
-# if len(found_ids) < 2:
-#     raise IOError('You should connect at least two motors on the bus for this test.')
-# #chose all motors and enable torque and set the same speed
-# ids = found_ids[:]
-# dxl_io.enable_torque(ids)
+if len(found_ids) < 2:
+    raise IOError('You should connect at least two motors on the bus for this test.')
+#chose all motors and enable torque and set the same speed
+ids = found_ids[:]
+dxl_io.enable_torque(ids)
     
-# def move_to(m_id, speed, pose):
-#     dxl_io.set_moving_speed(dict(zip(m_id, itertools.repeat(speed))))
-#     dxl_io.set_goal_position(dict(zip(m_id, pose)))
+def move_to(m_id, speed, pose):
+    dxl_io.set_moving_speed(dict(zip(m_id, itertools.repeat(speed))))
+    dxl_io.set_goal_position(dict(zip(m_id, pose)))
 
-# def get_present_position(m_id):
-#     p = dxl_io.get_present_position(m_id)
-#     return p
+def get_present_position(m_id):
+    p = dxl_io.get_present_position(m_id)
+    return p
 
 def Guss(mu, sigma, x):
 	f = 1/(sqrt(2*pi)*sigma)*pow(e, (-pow((x - mu), 2)/(2*pow(sigma,2))))
 	return f
 
-def run(m_id, current_pos, des_pos, time_inv):
+def run_guss(m_id, current_pos, des_pos, time_inv):
 	current_time = time.time()
 	des_time  = current_time + time_inv
 	n = len(m_id)
@@ -58,6 +56,52 @@ def run(m_id, current_pos, des_pos, time_inv):
 			print pose, speed
 		else:
 			break
+
+def triangle():
+
+
+def run_tri(m_id, current_pos, des_pos, time_inv):
+	current_time = time.time()
+	des_time  = current_time + time_inv
+	n = len(m_id)
+	time_tmp = time.time()
+
+	pose = current_pos
+
+	v_top = []
+	k =[]
+
+	for i in range(n):
+		v_top.append(2*(des_pos[i] - current_pos[i])/time_inv)
+	for i in range(n):
+		k.append(v_top[i]*2/time_inv)
+
+
+
+	while time.time()<= des_time:
+		time_slot = time.time() - time_tmp
+		time_tmp = time.time()
+
+
+
+		if time_tmp <= current_time + time_inv/2:
+			speed = []
+			for i in range(n):
+				speed.append(k[i]*(time_tmp - current_time))
+			for i in range(n):
+				pose[i] += speed[i]*time_slot
+
+
+		elif (time_tmp >= current_time + time_inv/2) & (time_tmp <= des_time):
+			speed = []
+			for i in range(n):
+				speed.append(k[i]*(des_time - time_tmp))
+			for i in range(n):
+				pose[i] += speed[i]*time_slot
+
+		move_to(m_id, pose, speed)
+
+	print pose
 
 pos1 = [1.32, -1.83]
 pos2 = [-86.07, 87.54]
