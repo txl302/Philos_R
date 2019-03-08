@@ -39,7 +39,7 @@ def run_tri(m_id, current_pos, des_pos, time_inv):
 			for i in range(n):
 				pose[i] += speed[i]*time_slot
 
-	print pose
+		print pose
 
 def main():
 	ids = [1, 2]
@@ -47,6 +47,7 @@ def main():
 	des_pos = [80, 80]
 	time_inv = 3
 	run_tri(ids, current_pos, des_pos, time_inv)
+	run_tri(ids, des_pos, current_pos, time_inv)
 
 if __name__ == '__main__':
 	main()
