@@ -36,7 +36,8 @@ def expression_rob(sel):
 if __name__ == '__main__':
     while True:
 
-        expression_rob(random.randint(1,4))   
+        expression_rob(random.randint(1,4)) 
+        cv2.waitKey(200)  
         time.sleep(20)
 
 
