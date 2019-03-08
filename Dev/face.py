@@ -10,7 +10,7 @@ if __name__ == '__main__':
     screen = screeninfo.get_monitors()[screen_id]
     width, height = screen.width, screen.height
 
-    image = cv2.imread('/expression/normal.png')
+    image = cv2.imread('expression/normal.png')
  
     window_name = 'projector'
     cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
