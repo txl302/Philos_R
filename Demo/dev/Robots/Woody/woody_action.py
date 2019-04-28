@@ -69,10 +69,14 @@ def run_tri(m_id, current_pos, des_pos, time_inv):
 	v_top = []
 	k =[]
 
+	#print(des_pos, current_pos)
+
 	for i in range(n):
 		v_top.append(2*(des_pos[i] - current_pos[i])/time_inv)
+		
 	for i in range(n):
 		k.append(v_top[i]*2/time_inv)
+
 
 
 
@@ -97,9 +101,10 @@ def run_tri(m_id, current_pos, des_pos, time_inv):
 			for i in range(n):
 				pose[i] += speed[i]*time_slot
 
-		move_to(m_id, pose, speed)
+		#print(pose)
+		#move_to(m_id, pose, speed)
 
-	print(pose)
+	
 
 pos1 = [1.32, -1.83]
 pos2 = [-86.07, 87.54]
@@ -111,5 +116,7 @@ if __name__ == '__main__':
 	while True:
 		run_tri(ids, pos1, pos2, 6)
 		time.sleep(3)
+		print(pos1, pos2)
 		run_tri(ids, pos2, pos1, 6)
 		time.sleep(3)
+		print(pos1, pos2)

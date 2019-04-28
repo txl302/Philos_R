@@ -4,6 +4,8 @@ import threading
 import os
 import time
 import itertools
+import numpy as np
+import json
 
 from random import randint
 
@@ -27,9 +29,10 @@ def camera_send():
 def run():
 	while True:
 		p = woody_action.get_present_position(m_ids)
-		m_pos = str(p)
+		#m_pos = str(p)
+		m_pos = json.dumps(p)
 		print m_pos
-		#s.sendto(p, ("192.168.1.87", 9901))
+		s.sendto(m_pos, ("192.168.1.237", 9901))
 
 
 
