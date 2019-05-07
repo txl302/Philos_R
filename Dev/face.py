@@ -21,6 +21,8 @@ def expression_rob(sel):
         image = cv2.imread('expression/sad.png')
     elif(sel == 4):
         image = cv2.imread('expression/superise.png')
+    elif(sel == 5):
+        image = cv2.imread('expression/happy.png')
 
  
     window_name = 'projector'
@@ -36,7 +38,7 @@ def expression_rob(sel):
 if __name__ == '__main__':
     while True:
 
-        expression_rob(random.randint(1,4)) 
+        expression_rob(random.randint(1,5)) 
         cv2.waitKey(200)  
         time.sleep(20)
 
